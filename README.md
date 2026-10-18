@@ -2,334 +2,174 @@
 
 # ECM — *Tu estilo, tu identidad*
 
-**Full-stack fashion e-commerce platform: customer storefront and role-based back office.**
+**Fashion e-commerce storefront and admin back office built with Angular 18.**
 
-![Java](https://img.shields.io/badge/Java-17+-ED8B00?logo=openjdk&logoColor=white)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4-6DB33F?logo=springboot&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?logo=postgresql&logoColor=white)
-![JWT](https://img.shields.io/badge/Auth-JWT-000000?logo=jsonwebtokens&logoColor=white)
 ![Angular](https://img.shields.io/badge/Angular-18-DD0031?logo=angular&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
+![SSR](https://img.shields.io/badge/SSR-enabled-4c9a6a)
+![Backend](https://img.shields.io/badge/API-Spring%20Boot-6DB33F?logo=springboot&logoColor=white)
 
 </div>
 
 ---
 
-## Table of contents
-
-- [Overview](#overview)
-- [Architecture](#architecture)
-- [Features](#features)
-- [Tech stack](#tech-stack)
-- [Repository structure](#repository-structure)
-- [Getting started](#getting-started)
-- [Configuration](#configuration)
-- [Domain model](#domain-model)
-- [Order lifecycle](#order-lifecycle)
-- [API overview](#api-overview)
-- [Security](#security)
-- [Deployment](#deployment)
-- [Roadmap](#roadmap)
-- [Author](#author)
-
----
-
 ## Overview
 
-ECM is a monorepo containing a complete e-commerce system for a fashion brand:
+ECM is the frontend of a full-stack fashion e-commerce platform. It provides a customer-facing storefront (catalog, product detail, cart, checkout, order tracking) and a role-based back office for staff (orders, payments, products, users, coupons, reports).
 
-- **`backend/`** — a Spring Boot REST API (catalog, orders, payments, coupons, reviews, reports, email notifications).
-- **`frontend/`** — an Angular 18 application with a customer storefront and a back office for sellers and admins.
-
-The system supports the full purchase flow: browsing and filtering the catalog, checkout with Yape, Plin or bank transfer, manual payment verification by staff, order fulfillment tracking, and post-delivery reviews.
-
-## Architecture
-
-```mermaid
-flowchart LR
-    U[Browser] --> F[Angular 18 SSR]
-    F -->|REST + JWT| B[Spring Boot API]
-    B --> D[(PostgreSQL)]
-    B --> S[Local file storage<br/>product images]
-    B --> M[SMTP<br/>order emails]
-```
-
-The backend follows a layered design: **Controller → Service → Repository**, with DTOs mapped by MapStruct so entities never leave the service layer.
+It consumes the REST API of the Spring Boot service in [`../backend`](../backend), part of the same monorepo.
 
 ## Features
 
 ### Storefront
-- Catalog with server-side pagination, search, sorting, and filters (category, price range, size, color, discounts, collections).
-- Product detail with image gallery, size and color selection, stock awareness, and reviews.
-- Wishlist synchronized with the account.
-- Cart and 3-step checkout (shipping address → payment → review) with coupon validation.
-- Order history with a status tracker and cancellation while the order is still pending.
+- **Home** with a full-bleed hero, marquee strip, horizontally scrolling categories, and scroll-driven reveal animations (with `prefers-reduced-motion` support).
+- **Catalog** with a sidebar of filters (category, price range slider, size, color), grid/list views, and server-side pagination.
+- **Product detail** with variant selection (size and color), stock awareness, and wishlist.
+- **Cart and 3-step checkout**: shipping address → payment method → review, followed by a confirmation screen.
+- **Payments**: Yape, Plin, and bank transfer. Clients attach a payment reference and can retry a rejected payment.
+- **Coupons**: validation and discount preview at checkout (the backend recalculates the final amount).
+- **Shipping**: cost computed from the backend configuration, with a free-shipping threshold.
+- **Profile**: order history with a status tracker (Pending → Paid → Confirmed → Preparing → Shipped → Delivered).
 
-### Back office
-- **Orders:** queue of paid orders, assignment to sellers, status transitions, and full status history.
-- **Payments:** staff confirm or reject submitted payments.
-- **Products, categories, collections, coupons, users:** full CRUD for admins.
-- **Inventory:** low-stock and out-of-stock alerts.
-- **Reports:** sales, inventory, and customers, with CSV export.
-
-### Platform
-- JWT authentication and three roles (`CLIENTE`, `VENDEDOR`, `ADMIN`); users can hold several roles.
-- Atomic checkout: stock validation, order, details, stock decrement, and payment are created in one transaction.
-- Optimistic locking on product stock to prevent overselling under concurrent purchases.
-- Stock and coupon usage are restored automatically when an order is cancelled.
-- Transactional email notifications (sent after commit, asynchronously).
+### Back office (role-based)
+- **Orders**: search, status filter, status changes, line-item detail, shipping address and payment panel.
+- **Payments**: staff can confirm or reject submitted payments.
+- **Products**: inventory management and **low-stock alerts** in the admin sidebar.
+- **Users** and **Coupons** management.
+- **CSV exports**: sales, inventory, and customers, downloaded with the authenticated session.
 
 ## Tech stack
 
-| Layer | Technology |
+| Area | Technology |
 |---|---|
-| Backend | Java, Spring Boot 4, Spring MVC, Spring Data JPA (Hibernate 7), Spring Security 7 |
-| Auth | JWT (JJWT) |
-| Mapping & boilerplate | MapStruct, Lombok |
-| Database | PostgreSQL |
-| API docs | springdoc OpenAPI (Swagger UI) |
-| Email | Spring Mail (SMTP) |
-| Frontend | Angular 18 (standalone components, signals), TypeScript, SSR, Reactive Forms |
-| Build | Maven (wrapper included), npm |
-
-## Repository structure
-
-```
-.
-├── backend/                       # Spring Boot API
-│   ├── src/main/java/com/example/ecm/
-│   │   ├── config/                # Security, CORS, web, async, data seeder
-│   │   ├── controller/            # REST controllers
-│   │   ├── service/               # Business logic (interfaces + impl)
-│   │   ├── repository/            # Spring Data repositories and specifications
-│   │   ├── model/                 # JPA entities and enums
-│   │   ├── DTO/                   # Request and response DTOs
-│   │   ├── mapper/                # MapStruct mappers
-│   │   └── exception/             # Global exception handling
-│   ├── src/main/resources/        # application.properties + dev / prod profiles
-│   ├── uploads/                   # Product images (git-ignored)
-│   └── pom.xml
-├── frontend/                      # Angular application
-│   ├── src/app/core/              # Guards, models, services, config
-│   ├── src/app/features/          # Home, catalog, checkout, profile, admin
-│   └── src/app/shared/            # Shared components
-└── README.md
-```
-
-> Package names may differ slightly from the tree above; check `backend/src/main/java` for the exact layout.
+| Framework | Angular 18 (standalone components, signals, `@if` / `@for` control flow) |
+| Rendering | Angular SSR with per-route render modes |
+| Language | TypeScript |
+| Forms | Reactive Forms |
+| HTTP | `HttpClient` with interceptors, blob downloads |
+| Routing | Lazy routes with role-based guards |
+| Styling | Hand-written CSS with design tokens (`theme-tokens.css`), light/dark ready |
 
 ## Getting started
 
 ### Prerequisites
+- Node.js 18.19+ or 20+
+- npm 9+
+- The ECM backend running locally (default `http://localhost:8080`), see the [root README](../README.md#getting-started)
 
-- Java 17 or newer
-- Node.js 18.19+ or 20+, and npm 9+
-- PostgreSQL 14+ with an empty database created for the project
+### Installation
 
-### 1. Clone
+This frontend lives in the `frontend/` folder of the ECM monorepo, next to the Spring Boot API in `backend/`.
 
 ```bash
 git clone https://github.com/DavidDevlo/ECM_ecomerce_monolito.git
-cd ECM_ecomerce_monolito
-```
-
-### 2. Run the backend
-
-Set the [required environment variables](#environment-variables) first, then:
-
-```bash
-cd backend
-./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
-```
-
-The API starts at `http://localhost:8080`. Run it **from the `backend/` directory**: `app.upload.dir=uploads` is a relative path, so images are stored in `backend/uploads/`.
-
-On first startup, a seeder creates the three roles and an initial admin user (see `ADMIN_*` variables). Hibernate creates the schema automatically in `dev`.
-
-### 3. Run the frontend
-
-```bash
-cd frontend
+cd ECM_ecomerce_monolito/frontend
 npm install
-npm start
 ```
 
-Open `http://localhost:4200`. Make sure `CORS_ALLOWED_ORIGINS` on the backend includes that origin.
+To run the full system, start the backend first (see the [root README](../README.md#getting-started)), then:
 
-### 4. API documentation
+### Development server
 
-With the backend running, Swagger UI is available at `http://localhost:8080/swagger-ui/index.html`.
+```bash
+npm start          # ng serve
+```
+
+Open `http://localhost:4200`. The app reloads on file changes.
+
+### Production build
+
+```bash
+npm run build
+```
+
+Artifacts are written to `dist/`. With SSR enabled, the server bundle can be started with the script defined in `package.json` (`serve:ssr:*`).
 
 ## Configuration
 
-### Environment variables
+### API base URL
+Point the app at your backend in the environment/service configuration used by the HTTP services in `src/app/core/services`.
 
-Secrets are never stored in the repository; every credential is read from the environment.
+### Payment accounts
+Payment details shown at checkout live in a single file and are **empty by default**. Fill in your own data; empty fields are hidden from the UI.
 
-| Variable | Required | Description |
-|---|---|---|
-| `JWT_SECRET` | Yes | Signing key for JWT. Use a long random value, different per environment. |
-| `DB_USERNAME` | Yes | PostgreSQL user. |
-| `DB_PASSWORD` | Yes | PostgreSQL password. |
-| `ADMIN_PASSWORD` | First run | Password of the bootstrap admin user. |
-| `ADMIN_USERNAME` | No | Bootstrap admin username (default `admin`). |
-| `ADMIN_EMAIL` | No | Bootstrap admin email (default `admin@ecm.com`). |
-| `CORS_ALLOWED_ORIGINS` | Prod | Comma-separated list of allowed frontend origins (default `http://localhost:4200`). |
-| `MAIL_ENABLED` | No | `true` to send order emails (default `false`). |
-| `MAIL_USERNAME` / `MAIL_PASSWORD` | If mail enabled | SMTP credentials (for Gmail, use an app password). |
-
-Generate a JWT secret:
-
-```bash
-# Git Bash / Linux / macOS
-openssl rand -base64 64
+```
+src/app/core/config/payment-accounts.ts
 ```
 
-```powershell
-# Windows PowerShell
-$b = New-Object byte[] 64
-[System.Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($b)
-[Convert]::ToBase64String($b)
-```
-
-> Changing `JWT_SECRET` invalidates all issued tokens; users must sign in again.
-
-### Business settings
-
-| Property | Default | Description |
-|---|---|---|
-| `app.shipping.free-threshold` | `299` | Subtotal from which shipping is free. |
-| `app.shipping.flat-rate` | `15` | Flat shipping cost below the threshold. |
-| `app.inventory.low-stock-threshold` | `5` | Stock level considered "low". |
-| `app.upload.dir` | `uploads` | Directory for uploaded product images. |
-| `jwt.expiration-ms` | `3600000` | Token lifetime (1 hour). |
-
-### Profiles
-
-| Profile | Purpose |
+| Method | Fields |
 |---|---|
-| `dev` | Local development. |
-| `prod` | Production deployment; all secrets come from the environment. |
+| Yape / Plin | `number`, `holder`, `qrUrl` |
+| Bank transfer | `bank`, `holder`, `account`, `cci` |
 
-## Domain model
+Payment logos are served from `public/assets/images/payment/` (`yape.png`, `plin.png`).
 
-| Area | Entities |
+> **Do not commit real account numbers to a public repository.**
+
+## Project structure
+
+```
+src/
+├── app/
+│   ├── core/
+│   │   ├── config/        # payment accounts
+│   │   ├── guards/        # auth and role guards
+│   │   ├── models/        # TypeScript contracts mirroring the API
+│   │   └── services/      # product, cart, order, payment, shipping, coupon, report
+│   ├── features/
+│   │   ├── home/          # landing page and product cards
+│   │   ├── products/      # catalog and filters
+│   │   ├── checkout/      # 3-step checkout and success screen
+│   │   ├── profile/       # customer area and order history
+│   │   └── admin/         # orders, products, users, coupons, layout
+│   ├── shared/
+│   │   └── components/    # order tracker, order payment, order shipping, header, footer
+│   └── app.routes.ts
+└── styles/
+    └── theme-tokens.css   # colors, spacing, --page-gutter, --page-max
+```
+
+## Backend contract
+
+The models in `core/models` mirror the backend DTOs.
+
+| Concern | Endpoint / value |
 |---|---|
-| Identity | `User`, `Profile`, `Role`, `UserRole` |
-| Catalog | `Category`, `Product`, `ProductImage`, `Collection` |
-| Sales | `Order`, `OrderDetail`, `OrderStatusHistory`, `Payment`, `Coupon`, `ShippingAddress` (embeddable) |
-| Engagement | `Review`, `WishlistItem`, `NewsletterSubscriber` |
+| Checkout | `POST` with `shippingAddress`, `paymentMethod` (`YAPE` \| `PLIN` \| `TRANSFER`), `paymentReference?`, `couponCode?`, `items[]` |
+| Order statuses | `PENDING`, `PAID`, `CONFIRMED`, `PREPARING`, `SHIPPED`, `DELIVERED`, `CANCELLED` |
+| Shipping config | `GET /api/shipping/config` → `{ freeShippingThreshold, flatRate }` |
+| Product filters | `GET /api/products/filters` → `{ sizes, colors, minPrice, maxPrice }` |
+| Coupons | `/api/coupons`, `GET /api/coupons/validate?code&subtotal` |
+| Reports | `/api/admin/reports/low-stock`, `/api/admin/reports/{sales\|inventory\|customers}/csv` |
 
-Enums: `OrderStatus`, `PaymentMethod` (`YAPE`, `PLIN`, `TRANSFER`), `PaymentStatus` (`PENDING`, `PAID`, `REJECTED`), `DiscountType` (`PERCENT`, `FIXED`).
+Pagination uses `pageSize`; the `size` query param is reserved for garment size.
 
-## Order lifecycle
+## Roles
 
-```mermaid
-stateDiagram-v2
-    [*] --> PENDING: checkout
-    PENDING --> PAID: staff confirms payment
-    PAID --> CONFIRMED: seller accepts
-    CONFIRMED --> PREPARING
-    PREPARING --> SHIPPED
-    SHIPPED --> DELIVERED
-    PENDING --> CANCELLED: customer
-    CONFIRMED --> CANCELLED: seller
-    PREPARING --> CANCELLED: seller
-    DELIVERED --> [*]
-    CANCELLED --> [*]
-```
+| Role | Access |
+|---|---|
+| Customer | Storefront, cart, checkout, profile, own orders |
+| Seller | Assigned orders and payment review |
+| Admin | Full back office, including users, coupons, and reports |
 
-- Admins can cancel from any non-final state.
-- Cancelling restores stock, releases the coupon, and rejects pending payments.
-- Every transition is stored in `order_status_history` (who, when, from and to).
-- Reviews are only allowed for products from a `DELIVERED` order.
+## Design notes
 
-## API overview
-
-Full interactive documentation is available in Swagger UI. Main groups:
-
-| Domain | Endpoints | Access |
-|---|---|---|
-| Auth | `POST /api/auth/**` | Public |
-| Catalog | `GET /api/products`, `/api/products/filters`, `/api/categories`, `/api/collections` | Public |
-| Product admin | `POST/PUT/DELETE /api/products`, image upload and gallery | Admin |
-| Orders | `POST /api/orders/checkout`, `GET /api/orders/me`, `GET /api/orders/{id}/history` | Customer |
-| Order fulfillment | `GET /api/orders/available`, `POST /api/orders/{id}/accept`, `PATCH /api/orders/{id}/status` | Seller, Admin |
-| Payments | `POST /api/payments/order/{id}`, `PATCH /api/payments/{id}/reference` | Customer |
-| Payment review | `GET /api/payments/pending`, `POST /api/payments/{id}/confirm\|reject` | Seller, Admin |
-| Coupons | `GET /api/coupons/validate`, CRUD under `/api/coupons` | Customer / Admin |
-| Reviews | `POST /api/reviews`, `GET /api/reviews/product/{id}` | Customer / Public |
-| Wishlist | `GET/POST/DELETE /api/wishlist` | Customer |
-| Profile | `GET/PUT /api/profiles/me` | Authenticated |
-| Shipping | `GET /api/shipping/config` | Public |
-| Reports | `GET /api/admin/reports/{sales\|inventory\|customers\|low-stock}`, plus `/csv` variants | Admin |
-
-### Catalog query parameters
-
-`GET /api/products?search=&categoryId=&collectionId=&onlyWithDiscount=&minPrice=&maxPrice=&productSize=&color=&sortBy=price|name|createdAt&direction=asc|desc&page=0&pageSize=12`
-
-The talla (garment size) filter is sent as `size` or `productSize`. Pagination uses **`pageSize`**; `size` is reserved for garment size.
-
-### Checkout request
-
-```json
-{
-  "shippingAddress": { "fullName": "", "phone": "", "address": "", "district": "", "reference": "" },
-  "paymentMethod": "YAPE",
-  "paymentReference": "optional",
-  "couponCode": "optional",
-  "items": [{ "productId": 1, "quantity": 2, "color": "Negro", "size": "M" }]
-}
-```
-
-The user is taken from the JWT, never from the request body. Prices, discounts, shipping, and totals are computed by the server.
-
-## Security
-
-- Stateless authentication with JWT; method-level authorization with `@PreAuthorize`.
-- Roles are checked per request and only active role assignments grant authorities.
-- Ownership checks: customers can only read their own orders and payments.
-- No secrets in version control; all credentials come from environment variables.
-- Single CORS configuration, driven by `CORS_ALLOWED_ORIGINS`.
-- Consistent error responses through a global exception handler (400, 401, 403, 404, 409, 500).
-
-## Deployment
-
-The backend is deployed on AWS. In production:
-
-1. Provision PostgreSQL (for example, Amazon RDS) and create the database.
-2. Define the environment variables listed above in the service that runs the app.
-3. Build and run:
-
-   ```bash
-   cd backend
-   ./mvnw -DskipTests package
-   java -jar target/*.jar --spring.profiles.active=prod
-   ```
-
-4. Build the frontend with `npm run build` and serve it, setting the API base URL to the public backend address.
-5. Set `CORS_ALLOWED_ORIGINS` to the public frontend origin.
-
-Product images are stored on local disk (`uploads/`); use a persistent volume or object storage in production.
-
-If you add a value to an enum that already has a column with a `CHECK` constraint, `ddl-auto=update` will not update that constraint; adjust it with SQL or adopt a migration tool.
+- Animations use the individual `translate` / `scale` properties so they never collide with `transform`-based hover effects.
+- Scroll-driven animations (`animation-timeline: view()`) are feature-detected with an `@supports` fallback.
+- Motion is disabled globally under `prefers-reduced-motion: reduce`.
+- Layout width is controlled by two global tokens, `--page-gutter` and `--page-max`.
 
 ## Roadmap
 
-- [ ] Stock per size/variant (`ProductVariant`)
-- [ ] HTML email templates
-- [ ] Multiple saved shipping addresses
-- [ ] Payment proof image upload
-- [ ] Product Q&A, search autocomplete, back-in-stock alerts
-- [ ] Card payments through a payment gateway
-- [ ] Database migrations with Flyway
-- [ ] `@EntityGraph` tuning for paginated queries
-- [ ] Automated tests and CI pipeline
+- [ ] Card payments (requires a payment gateway on the backend)
+- [ ] Brand, rating, and category-count filters (requires backend support)
+- [ ] Unit and end-to-end test coverage
+- [ ] CI pipeline (lint, test, build)
 
 ## Author
 
-**Naira Alture Edgar David** — Systems Engineering, Universidad Peruana Unión (UPeU).
+**NAIRA ALTURE EDGAR DAVID** — Systems Engineering, Universidad Peruana Unión (UPeU).
 
 ## License
 
-Developed for academic purposes. Add a license file if you plan to distribute it.
+This project was developed for academic purposes. Add a license file if you plan to distribute it.
