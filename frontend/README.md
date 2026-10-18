@@ -168,7 +168,7 @@ Pagination uses `pageSize`; the `size` query param is reserved for garment size.
 
 ## Author
 
-**Vladimir Quispe Turpo** — Systems Engineering, Universidad Peruana Unión (UPeU).
+**NAIRA ALTURE EDGAR DAVID** — Systems Engineering, Universidad Peruana Unión (UPeU).
 
 ## License
 
