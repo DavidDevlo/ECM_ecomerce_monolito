@@ -34,3 +34,12 @@ build/
 uploads/
 .env
 .env.*
+
+### Monorepo ###
+**/.mvn/wrapper/maven-wrapper.jar
+node_modules/
+.angular/
+dist/
+uploads/
+.env
+.env.*
