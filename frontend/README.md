@@ -2,9 +2,9 @@
 
 # ECM — *Tu estilo, tu identidad*
 
-**Fashion e-commerce storefront and admin back office built with Angular 18.**
+**Fashion e-commerce storefront and admin back office built with Angular 20.**
 
-![Angular](https://img.shields.io/badge/Angular-18-DD0031?logo=angular&logoColor=white)
+![Angular](https://img.shields.io/badge/Angular-20-DD0031?logo=angular&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
 ![SSR](https://img.shields.io/badge/SSR-enabled-4c9a6a)
 ![Backend](https://img.shields.io/badge/API-Spring%20Boot-6DB33F?logo=springboot&logoColor=white)
@@ -42,7 +42,7 @@ It consumes the REST API of the Spring Boot service in [`../backend`](../backend
 
 | Area | Technology |
 |---|---|
-| Framework | Angular 18 (standalone components, signals, `@if` / `@for` control flow) |
+| Framework | Angular 20 (standalone components, signals, `@if` / `@for` control flow) |
 | Rendering | Angular SSR with per-route render modes |
 | Language | TypeScript |
 | Forms | Reactive Forms |
@@ -53,7 +53,7 @@ It consumes the REST API of the Spring Boot service in [`../backend`](../backend
 ## Getting started
 
 ### Prerequisites
-- Node.js 18.19+ or 20+
+- Node.js 20.19+ or 22.12+ (required by Angular 20)
 - npm 9+
 - The ECM backend running locally (default `http://localhost:8080`), see the [root README](../README.md#getting-started)
 
@@ -88,7 +88,7 @@ Artifacts are written to `dist/`. With SSR enabled, the server bundle can be sta
 ## Configuration
 
 ### API base URL
-Point the app at your backend in the environment/service configuration used by the HTTP services in `src/app/core/services`.
+Point the app at your backend in `src/app/environments/environment.ts` (development, default `http://localhost:8080`) and `src/app/environments/environment.prod.ts` (production build). Set `apiUrl` to the backend origin **without** a trailing `/api`; the services append `/api/...` themselves.
 
 ### Payment accounts
 Payment details shown at checkout live in a single file and are **empty by default**. Fill in your own data; empty fields are hidden from the UI.
