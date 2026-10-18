@@ -1,0 +1,29 @@
+<section class="hc-page">
+
+  <header class="hc-header">
+    <span class="hc-eyebrow font-mono">COLECCIONES</span>
+    <h2 class="font-display">Piezas que van juntas</h2>
+  </header>
+
+  @if (loading()) {
+    <p class="hc-state-msg">Cargando catálogo...</p>
+  } @else if (loadError()) {
+    <p class="hc-state-msg hc-state-error">
+      No se pudo cargar el catálogo.
+      <button class="hc-link-btn" type="button" (click)="loadCollections()">Reintentar</button>
+    </p>
+  } @else if (collections().length === 0) {
+    <p class="hc-state-msg">Todavía no hay colecciones activas.</p>
+  } @else {
+
+    @for (collection of collections(); track collection.id) {
+      <app-collection-carousel
+        [title]="collection.name"
+        [slogan]="collection.slogan"
+        [products]="collection.products"
+      />
+    }
+
+  }
+
+</section>

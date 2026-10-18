@@ -1,0 +1,219 @@
+.wl-page {
+  padding: 60px var(--page-gutter) 90px;
+  max-width: var(--page-max);
+  margin: 0 auto;
+}
+
+.wl-header {
+  margin-bottom: 32px;
+}
+
+.wl-header h1 {
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.wl-count {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+.wl-state-msg {
+  padding: 60px 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.wl-empty {
+  text-align: center;
+  padding: 80px 24px;
+  color: var(--text-muted);
+}
+
+.wl-empty svg {
+  margin-bottom: 16px;
+  opacity: 0.6;
+}
+
+.wl-empty p {
+  margin-bottom: 22px;
+  font-size: 15px;
+}
+
+.wl-btn-primary {
+  display: inline-block;
+  padding: 12px 26px;
+  border-radius: 999px;
+  background: var(--text);
+  color: var(--bg);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.wl-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.wl-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.wl-card:hover {
+  transform: translateY(-6px);
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+}
+
+.wl-media {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 220px;
+  background: linear-gradient(155deg, color-mix(in srgb, var(--accent) 14%, var(--bg-elevated)), var(--bg));
+  text-decoration: none;
+  overflow: hidden;
+}
+
+.wl-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.wl-ph {
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 0 16px;
+}
+
+.wl-discount-tag,
+.wl-out-tag {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.wl-discount-tag {
+  background: #dc6a5c;
+  color: #fff;
+}
+
+.wl-out-tag {
+  background: color-mix(in srgb, #dc6a5c 24%, transparent);
+  color: #dc6a5c;
+  font-weight: 600;
+}
+
+.wl-discount-tag + .wl-out-tag {
+  top: 40px;
+}
+
+.wl-remove-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: var(--bg-elevated);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+}
+
+.wl-remove-btn:hover {
+  background: #dc6a5c;
+  color: #fff;
+  transform: scale(1.06);
+}
+
+.wl-info {
+  padding: 16px 18px 6px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.wl-info h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+.wl-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.wl-price {
+  font-size: 14px;
+  color: var(--accent-strong);
+}
+
+.wl-price-original {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.wl-add-btn {
+  margin: 10px 18px 18px;
+  padding: 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.wl-add-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.wl-add-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 1080px) {
+  .wl-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 780px) {
+  .wl-page { padding: 40px 24px 60px; }
+  .wl-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 480px) {
+  .wl-grid { grid-template-columns: 1fr; }
+}

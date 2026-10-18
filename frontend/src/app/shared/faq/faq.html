@@ -1,0 +1,27 @@
+<section class="faq-page">
+
+  <span class="faq-eyebrow font-mono">AYUDA</span>
+  <h1 class="font-display">Preguntas frecuentes</h1>
+
+  <div class="faq-list">
+    @for (item of items; track item.question; let i = $index) {
+      <div class="faq-item" [class.faq-item-open]="openIndex() === i">
+        <button class="faq-question" type="button" (click)="toggle(i)">
+          {{ item.question }}
+          <svg
+            class="faq-chevron"
+            [class.faq-chevron-open]="openIndex() === i"
+            width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          >
+            <path d="m6 9 6 6 6-6"/>
+          </svg>
+        </button>
+
+        @if (openIndex() === i) {
+          <p class="faq-answer">{{ item.answer }}</p>
+        }
+      </div>
+    }
+  </div>
+
+</section>

@@ -1,0 +1,190 @@
+<div class="home-progress" aria-hidden="true"></div>
+
+<section class="home-hero">
+
+  @for (slide of heroSlides; track slide.image) {
+    <img
+      class="home-hero-bg"
+      [class.active]="$index === heroIndex()"
+      [src]="slide.image"
+      alt=""
+      aria-hidden="true"
+    />
+  }
+
+  @if (heroSlides[heroIndex()]; as slide) {
+    <!-- Solo se ve en celular (CSS): la foto panorámica recortada ahí
+         deja de mostrar el texto grabado, así que se reemplaza por
+         este texto real sobre un fondo liso. En desktop no ocupa
+         espacio ni se muestra — cero texto duplicado. -->
+    <div class="home-hero-mobile-text">
+      <span class="home-hero-eyebrow font-mono">{{ slide.eyebrow }}</span>
+      <h1 class="font-display">
+        <span class="home-hero-title-light">{{ slide.titleLight }}</span><br />
+        <span class="home-hero-title-bold">{{ slide.titleBold }}</span>
+      </h1>
+      <p class="home-hero-subtitle">{{ slide.subtitle }}</p>
+    </div>
+
+    <div class="home-hero-actions">
+      <a
+        class="btn home-hero-btn-primary"
+        [style.background-color]="slide.btnBg"
+        [style.color]="slide.btnColor"
+        routerLink="/products"
+      >
+        Explorar colección
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M5 12h14M13 6l6 6-6 6"/>
+        </svg>
+      </a>
+      @if (!auth.isLoggedIn()) {
+        <a
+          class="btn home-hero-btn-secondary"
+          [style.border-color]="slide.secondaryColor"
+          [style.color]="slide.secondaryColor"
+          routerLink="/login"
+        >Iniciar sesión</a>
+      }
+    </div>
+  }
+
+  <button class="home-hero-arrow home-hero-arrow-left" type="button" (click)="prevSlide()" aria-label="Diapositiva anterior">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="m15 18-6-6 6-6"/>
+    </svg>
+  </button>
+
+  <button class="home-hero-arrow home-hero-arrow-right" type="button" (click)="nextSlide()" aria-label="Siguiente diapositiva">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="m9 18 6-6-6-6"/>
+    </svg>
+  </button>
+
+  <div class="home-hero-dots">
+    @for (slide of heroSlides; track $index) {
+      <button
+        type="button"
+        class="home-hero-dot"
+        [class.active]="$index === heroIndex()"
+        (click)="goToSlide($index)"
+        [attr.aria-label]="'Ir a la diapositiva ' + ($index + 1)"
+      ></button>
+    }
+  </div>
+</section>
+
+<!-- Marquee infinito: el grupo se repite 2 veces y la pista se desplaza -50%. -->
+<div class="home-marquee" aria-label="Beneficios de comprar en ECM">
+  <div class="home-marquee-track">
+    @for (copy of [0, 1]; track copy) {
+      <div class="home-marquee-group" [attr.aria-hidden]="copy === 1 ? 'true' : null">
+        <span class="home-marquee-item">Envío gratis desde S/ 299</span>
+        <span class="home-marquee-item">Devoluciones en 15 días</span>
+        <span class="home-marquee-item">Pago seguro con Yape, Plin y transferencia</span>
+        <span class="home-marquee-item">Nuevos ingresos cada semana</span>
+        <span class="home-marquee-item">Tu estilo, tu identidad</span>
+      </div>
+    }
+  </div>
+</div>
+
+@if (!auth.isLoggedIn()) {
+  <section class="home-section">
+    <div class="home-welcome-card">
+      <div class="home-welcome-text">
+        <span class="home-eyebrow font-mono">BIENVENIDO A ECM</span>
+        <h2 class="font-display">Creá tu cuenta y hacela tuya</h2>
+        <p>Guardá tus favoritos, seguí tus pedidos y agilizá el checkout — es gratis y toma un minuto.</p>
+      </div>
+      <div class="home-welcome-actions">
+        <a class="btn home-welcome-btn-primary" routerLink="/register">Crear cuenta</a>
+        <a class="btn home-welcome-btn-outline" routerLink="/login">Iniciar sesión</a>
+      </div>
+    </div>
+  </section>
+}
+
+@if (categories().length > 0) {
+  <section class="home-section home-categories">
+    <div class="home-section-head">
+      <span class="home-eyebrow font-mono">EXPLORA</span>
+      <h2 class="font-display">Explora por categoría</h2>
+    </div>
+
+    <div class="home-cat-grid">
+      @for (cat of categories(); track cat.id) {
+        <a class="home-cat-tile" routerLink="/products" [queryParams]="{ categoryId: cat.id }">
+          @if (previewFor(cat.id); as url) {
+            <img [src]="url | imageUrl" [alt]="cat.name" />
+          } @else {
+            <span class="home-cat-ph" aria-hidden="true"></span>
+          }
+          <span class="home-cat-overlay" aria-hidden="true"></span>
+          <span class="home-cat-label">{{ cat.name }}</span>
+        </a>
+      }
+
+      <a class="home-cat-tile home-cat-tile-promo" routerLink="/products" [queryParams]="{ onlyWithDiscount: true }">
+        <span class="home-cat-promo-eyebrow font-mono">OFERTAS</span>
+        <span class="home-cat-label">Piezas con descuento</span>
+      </a>
+    </div>
+  </section>
+}
+
+@if (productsLoading()) {
+  <p class="home-state-msg">Cargando catálogo...</p>
+} @else {
+
+  @if (featured().length > 0) {
+    <section class="home-section">
+      <div class="home-section-head">
+        <span class="home-eyebrow font-mono">DESTACADOS</span>
+        <h2 class="font-display">Los favoritos de la temporada</h2>
+      </div>
+
+      <div class="home-product-grid">
+        @for (product of featured(); track product.id) {
+          <app-home-product-card [product]="product" [ratingSummary]="ratingFor(product.id)" />
+        }
+      </div>
+    </section>
+  }
+
+  @if (latest().length > 0) {
+    <section class="home-section">
+      <div class="home-section-head">
+        <span class="home-eyebrow font-mono">NUEVOS INGRESOS</span>
+        <h2 class="font-display">Descubre lo último</h2>
+      </div>
+
+      <div class="home-product-grid">
+        @for (product of latest(); track product.id) {
+          <app-home-product-card [product]="product" [ratingSummary]="ratingFor(product.id)" />
+        }
+      </div>
+    </section>
+  }
+
+}
+
+<app-home-catalog />
+
+<section class="home-promo-banner">
+  <img class="home-promo-bg" src="assets/images/promo/promo-banner.png" alt="" aria-hidden="true" />
+
+  <!-- Solo celular: mismo criterio que el hero. -->
+  <div class="home-promo-mobile-text">
+    <span class="home-promo-eyebrow font-mono">EXCLUSIVO ONLINE</span>
+    <h2 class="font-display">Envío gratis por compras mayores a S/ 299 </h2>
+    <p>Tu estilo, sin límites.</p>
+  </div>
+
+  <a class="btn home-promo-btn" routerLink="/products">
+    Ver productos
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+      <path d="M5 12h14M13 6l6 6-6 6"/>
+    </svg>
+  </a>
+</section>

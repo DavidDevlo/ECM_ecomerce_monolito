@@ -1,0 +1,26 @@
+<section class="about-page">
+
+  <span class="about-eyebrow font-mono">SOBRE ECM</span>
+  <h1 class="font-display">Un proyecto académico, construido como uno real.</h1>
+
+  <p class="about-text">
+    ECM es un e-commerce de moda desarrollado como proyecto de la carrera de Ingeniería de
+    Sistemas. La idea fue tratarlo como un producto real: autenticación por roles, carrito y
+    checkout funcionales, un panel de administración completo y un flujo de vendedor que
+    acepta y gestiona pedidos — no solo pantallas de muestra.
+  </p>
+
+  <div class="about-stack">
+    @for (item of stack; track item.label) {
+      <div class="about-stack-item">
+        <span class="about-stack-label font-mono">{{ item.label }}</span>
+        <span class="about-stack-value">{{ item.value }}</span>
+      </div>
+    }
+  </div>
+
+  <a class="about-btn" href="https://github.com/TU-USUARIO/ecm" target="_blank" rel="noopener noreferrer">
+    Ver el código en GitHub
+  </a>
+
+</section>

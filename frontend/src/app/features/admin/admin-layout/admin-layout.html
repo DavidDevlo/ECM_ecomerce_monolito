@@ -1,0 +1,39 @@
+<div class="admin-shell">
+
+  <aside class="admin-sidebar">
+    <span class="admin-sidebar-tag font-mono">PANEL ADMIN</span>
+
+    <button class="admin-stock-alert" type="button" [class.has-alerts]="alertCount() > 0" (click)="toggle()">
+      <span>Stock bajo</span>
+      <span class="admin-stock-badge font-mono">{{ alertCount() }}</span>
+    </button>
+
+    @if (open() && report(); as r) {
+      <div class="admin-stock-panel">
+        <p class="admin-stock-summary">{{ r.outOfStockCount }} agotados · {{ r.lowStockCount }} con stock bajo</p>
+        @for (p of r.products; track p.id) {
+          <a class="admin-stock-item" routerLink="products">
+            <span>{{ p.name }}</span>
+            <span class="font-mono" [class.zero]="p.stock === 0">{{ p.stock }}</span>
+          </a>
+        } @empty {
+          <p class="admin-stock-summary">Todo en orden.</p>
+        }
+      </div>
+    }
+
+    <nav>
+      <a routerLink="products" routerLinkActive="active">Productos</a>
+      <a routerLink="orders" routerLinkActive="active">Pedidos</a>
+      <a routerLink="users" routerLinkActive="active">Usuarios</a>
+      <a routerLink="categories" routerLinkActive="active">Categorías</a>
+      <a routerLink="collections" routerLinkActive="active">Colecciones</a>
+      <a routerLink="coupons" routerLinkActive="active">Cupones</a>
+    </nav>
+  </aside>
+
+  <main class="admin-content">
+    <router-outlet />
+  </main>
+
+</div>

@@ -1,0 +1,161 @@
+.cc-section {
+  margin-bottom: 44px;
+  animation: cc-fade-in 0.5s ease both;
+}
+
+@keyframes cc-fade-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.cc-heading {
+  margin-bottom: 16px;
+}
+
+.cc-heading h2 {
+  font-size: 22px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.cc-slogan {
+  font-size: 13px;
+  color: var(--accent);
+  margin-top: 4px;
+}
+
+.cc-carousel {
+  position: relative;
+}
+
+.cc-track {
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+
+.cc-track::-webkit-scrollbar {
+  display: none;
+}
+
+.cc-card {
+  flex: 0 0 auto;
+  width: 200px;
+  scroll-snap-align: start;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s ease;
+}
+
+.cc-card:hover {
+  transform: translateY(-5px);
+}
+
+.cc-card-media {
+  position: relative;
+  height: 220px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: linear-gradient(155deg, color-mix(in srgb, var(--accent) 14%, var(--bg-elevated)), var(--bg));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.cc-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cc-ph {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 0 12px;
+}
+
+.cc-discount-tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #dc6a5c;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.cc-card-name {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.cc-card-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.cc-card-price {
+  font-size: 13px;
+  color: var(--accent-strong);
+}
+
+.cc-card-price-original {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.cc-arrow {
+  position: absolute;
+  top: 90px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  z-index: 2;
+}
+
+.cc-arrow:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.cc-arrow-left {
+  left: -14px;
+}
+
+.cc-arrow-right {
+  right: -14px;
+}
+
+@media (max-width: 640px) {
+  .cc-arrow {
+    display: none;
+  }
+
+  .cc-card {
+    width: 160px;
+  }
+
+  .cc-card-media {
+    height: 180px;
+  }
+}

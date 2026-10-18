@@ -1,0 +1,88 @@
+.vs-wrap {
+  position: relative;
+}
+
+.vs-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.vs-trigger:hover {
+  border-color: var(--accent);
+}
+
+.vs-label {
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.vs-current {
+  font-weight: 700;
+}
+
+.vs-chevron {
+  color: var(--text-muted);
+  transition: transform 0.15s ease;
+}
+
+.vs-chevron-open {
+  transform: rotate(180deg);
+}
+
+.vs-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+}
+
+.vs-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 160px;
+  padding: 6px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow);
+  z-index: 96;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.vs-menu-item {
+  padding: 9px 12px;
+  border-radius: 9px;
+  border: none;
+  background: none;
+  color: var(--text);
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.vs-menu-item:hover {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.vs-menu-item.active {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+@media (max-width: 860px) {
+  .vs-label {
+    display: none;
+  }
+}

@@ -1,0 +1,20 @@
+.sr-wrap {
+  position: relative;
+  display: inline-block;
+  line-height: 1;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.sr-stars-bg {
+  color: var(--border);
+}
+
+.sr-stars-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  color: #d9a441;
+  white-space: nowrap;
+}

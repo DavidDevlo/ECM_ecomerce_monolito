@@ -1,0 +1,80 @@
+<section class="wl-page">
+
+  <header class="wl-header">
+    <h1 class="font-display">Mi lista de deseos</h1>
+    @if (wishlist.itemCount() > 0) {
+      <p class="wl-count">{{ wishlist.itemCount() }} {{ wishlist.itemCount() === 1 ? 'producto' : 'productos' }}</p>
+    }
+  </header>
+
+  @if (wishlist.loading()) {
+    <p class="wl-state-msg">Cargando tu lista...</p>
+  } @else if (wishlist.itemCount() === 0) {
+    <div class="wl-empty">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+        <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/>
+      </svg>
+      <p>Todavía no agregaste productos a tu lista de deseos.</p>
+      <a routerLink="/products" class="wl-btn-primary">Explorar productos</a>
+    </div>
+  } @else {
+
+    <div class="wl-grid">
+      @for (product of wishlist.items(); track product.id) {
+        <div class="wl-card">
+
+          <a class="wl-media" [routerLink]="['/products', product.id]">
+            @if (product.imageUrl) {
+              <img [src]="product.imageUrl | imageUrl" [alt]="product.name" />
+            } @else {
+              <span class="wl-ph">{{ product.name }}</span>
+            }
+
+            @if (product.discountPercentage) {
+              <span class="wl-discount-tag">-{{ product.discountPercentage }}%</span>
+            }
+
+            @if (product.stock === 0) {
+              <span class="wl-out-tag">Sin stock</span>
+            }
+          </a>
+
+          <button
+            class="wl-remove-btn"
+            type="button"
+            [attr.aria-label]="'Quitar ' + product.name + ' de la lista de deseos'"
+            (click)="remove(product)"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 6 6 18M6 6l12 12"/>
+            </svg>
+          </button>
+
+          <a class="wl-info" [routerLink]="['/products', product.id]">
+            <h3>{{ product.name }}</h3>
+            <p class="wl-price-row">
+              @if (product.discountPercentage) {
+                <span class="wl-price-original font-mono">S/ {{ product.price | number: '1.2-2' }}</span>
+              }
+              <span class="wl-price font-mono">S/ {{ effectivePrice(product) | number: '1.2-2' }}</span>
+            </p>
+          </a>
+
+          @if (viewMode.canShop()) {
+            <button
+              class="wl-add-btn"
+              type="button"
+              [disabled]="product.stock === 0"
+              (click)="addToCart(product)"
+            >
+              {{ product.stock === 0 ? 'Sin stock' : (hasVariants(product) ? 'Elegir color/talla' : 'Agregar al carrito') }}
+            </button>
+          }
+
+        </div>
+      }
+    </div>
+
+  }
+
+</section>

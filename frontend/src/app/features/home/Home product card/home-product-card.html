@@ -1,0 +1,61 @@
+<a class="hpc-card" [routerLink]="['/products', product().id]">
+
+  <div class="hpc-media">
+    @if (product().imageUrl) {
+      <img class="hpc-img" [src]="product().imageUrl | imageUrl" [alt]="product().name" loading="lazy" />
+      @if (product().images?.length) {
+        <!-- Segunda foto: se mezcla suavemente al pasar el mouse. -->
+        <img class="hpc-img hpc-img-alt" [src]="product().images![0].url | imageUrl" alt="" aria-hidden="true" loading="lazy" />
+      }
+    } @else {
+      <span class="hpc-ph">{{ product().name }}</span>
+    }
+
+    @if (product().discountPercentage) {
+      <span class="hpc-badge">-{{ product().discountPercentage }}%</span>
+    }
+
+    @if (product().stock === 0) {
+      <span class="hpc-out-tag">Sin stock</span>
+    }
+
+    @if (viewMode.canShop() && auth.isLoggedIn()) {
+      <button
+        class="hpc-wish-btn"
+        type="button"
+        [class.active]="wishlist.isInWishlist(product().id)"
+        [attr.aria-label]="wishlist.isInWishlist(product().id) ? 'Quitar de mi lista de deseos' : 'Agregar a mi lista de deseos'"
+        (click)="toggleWishlist($event)"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" [attr.fill]="wishlist.isInWishlist(product().id) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2">
+          <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/>
+        </svg>
+      </button>
+    }
+    <span class="hpc-quick" aria-hidden="true">
+      Ver producto
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </span>
+  </div>
+
+  <div class="hpc-info">
+    <h3>{{ product().name }}</h3>
+
+    @if (ratingSummary(); as summary) {
+      @if (summary.totalReviews > 0) {
+        <div class="hpc-rating">
+          <app-star-rating [rating]="summary.averageRating ?? 0" [size]="13" />
+          <span class="hpc-rating-count">({{ summary.totalReviews }})</span>
+        </div>
+      }
+    }
+
+    <p class="hpc-price-row">
+      @if (product().discountPercentage) {
+        <span class="hpc-price-original font-mono">S/ {{ product().price | number: '1.2-2' }}</span>
+      }
+      <span class="hpc-price font-mono">S/ {{ effectivePrice(product()) | number: '1.2-2' }}</span>
+    </p>
+  </div>
+
+</a>

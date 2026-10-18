@@ -1,0 +1,31 @@
+@if (viewMode.hasMultipleRoles()) {
+  <div class="vs-wrap">
+    <button class="vs-trigger" type="button" (click)="toggleMenu()">
+      <span class="vs-label font-mono">VIENDO COMO</span>
+      <span class="vs-current">{{ roleLabel(viewMode.activeView()) }}</span>
+      <svg
+        class="vs-chevron"
+        [class.vs-chevron-open]="menuOpen()"
+        width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+      >
+        <path d="m6 9 6 6 6-6"/>
+      </svg>
+    </button>
+
+    @if (menuOpen()) {
+      <div class="vs-backdrop" (click)="closeMenu()"></div>
+      <div class="vs-menu">
+        @for (role of viewMode.availableRoles(); track role) {
+          <button
+            class="vs-menu-item"
+            [class.active]="role === viewMode.activeView()"
+            type="button"
+            (click)="selectRole(role)"
+          >
+            {{ roleLabel(role) }}
+          </button>
+        }
+      </div>
+    }
+  </div>
+}

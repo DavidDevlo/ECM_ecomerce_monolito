@@ -1,0 +1,402 @@
+.pf-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
+.pf-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.pf-identity {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.pf-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Big Shoulders Display', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.pf-name {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.pf-email {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.pf-btn-logout {
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pf-btn-logout:hover {
+  border-color: #dc6a5c;
+  color: #dc6a5c;
+}
+
+.pf-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 32px 0;
+}
+
+.pf-orders h2 {
+  font-size: 22px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.pf-action-error {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: color-mix(in srgb, #dc6a5c 14%, transparent);
+  border: 1px solid color-mix(in srgb, #dc6a5c 40%, transparent);
+  color: #dc6a5c;
+  font-size: 13px;
+}
+
+.pf-empty {
+  text-align: center;
+  padding: 50px 20px;
+  color: var(--text-muted);
+}
+
+.pf-empty p {
+  margin-bottom: 18px;
+  font-size: 14px;
+}
+
+.pf-btn-primary {
+  display: inline-block;
+  padding: 11px 24px;
+  border-radius: 999px;
+  background: var(--text);
+  color: var(--bg);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* Lista de pedidos */
+.pf-order {
+  border-bottom: 1px solid var(--border);
+}
+
+.pf-order:last-child {
+  border-bottom: none;
+}
+
+.pf-order-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+}
+
+.pf-order-id {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.pf-order-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 3px;
+}
+
+.pf-order-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.pf-chevron {
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+}
+
+.pf-chevron-open {
+  transform: rotate(180deg);
+}
+
+.pf-badge {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.pf-status-delivered {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  color: var(--accent-strong);
+}
+
+.pf-status-shipped {
+  background: color-mix(in srgb, #5b8fd9 20%, transparent);
+  color: #5b8fd9;
+}
+
+.pf-status-confirmed {
+  background: color-mix(in srgb, #5b8fd9 12%, transparent);
+  color: #5b8fd9;
+}
+
+.pf-status-pending {
+  background: color-mix(in srgb, #d9a441 20%, transparent);
+  color: #d9a441;
+}
+
+.pf-status-cancelled {
+  background: color-mix(in srgb, #dc6a5c 20%, transparent);
+  color: #dc6a5c;
+}
+
+/* Detalle expandido */
+.pf-order-details {
+  padding: 0 4px 20px;
+}
+
+.pf-detail-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.pf-detail-thumb {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.pf-detail-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pf-detail-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.pf-detail-name {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.pf-detail-qty {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.pf-detail-subtotal {
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.pf-order-total {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 12px;
+  margin-top: 6px;
+  border-top: 1px solid var(--border);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.pf-order-cancel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.pf-btn-cancel {
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pf-btn-cancel:hover {
+  border-color: #dc6a5c;
+  color: #dc6a5c;
+}
+
+.pf-cancel-confirm-text {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.pf-btn-danger-sm,
+.pf-btn-ghost-sm {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text);
+}
+
+.pf-btn-danger-sm {
+  border-color: #dc6a5c;
+  color: #dc6a5c;
+}
+
+.pf-state-msg {
+  padding: 60px 24px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.pf-state-error {
+  color: #dc6a5c;
+}
+
+.pf-link-btn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 6px;
+}
+
+/* Panel de vendedor */
+.pf-seller h2 {
+  font-size: 22px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.pf-seller-subhead {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  margin: 22px 0 8px;
+}
+
+.pf-seller-subhead:first-of-type {
+  margin-top: 0;
+}
+
+.pf-empty-inline {
+  font-size: 13px;
+  color: var(--text-muted);
+  padding: 8px 4px 16px;
+}
+
+.pf-order-row-static {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 4px;
+  cursor: default;
+}
+
+.pf-seller-actions {
+  display: flex;
+  gap: 10px;
+  padding: 0 4px 18px;
+}
+
+.pf-btn-accept {
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: none;
+  background: var(--accent);
+  color: var(--bg);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.pf-btn-accept:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Nota de vista Admin (perfil sin compras/ventas propias) */
+.pf-admin-note {
+  padding: 32px 4px;
+  max-width: 480px;
+}
+
+.pf-admin-tag {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  padding: 6px 14px;
+  margin-bottom: 16px;
+}
+
+.pf-admin-note p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-muted);
+  margin-bottom: 22px;
+}

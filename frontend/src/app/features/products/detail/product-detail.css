@@ -1,0 +1,957 @@
+.pdet-page {
+  padding: 48px var(--page-gutter) 90px;
+  max-width: 1360px;
+  margin: 0 auto;
+}
+
+.pdet-breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 18px;
+}
+
+.pdet-breadcrumbs a {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.pdet-breadcrumbs a:hover {
+  color: var(--accent);
+}
+
+.pdet-crumb-sep {
+  opacity: 0.5;
+}
+
+.pdet-crumb-current {
+  color: var(--text);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+.pdet-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 13px;
+  margin-bottom: 28px;
+}
+
+.pdet-back:hover {
+  color: var(--accent);
+}
+
+.pdet-layout {
+  display: grid;
+  /* La columna de imagen ya no reparte 50/50 con el texto — se limita
+     a un ancho de foto de producto razonable (320-520px) y el texto
+     se lleva el resto. Antes, en pantallas medianas, 1fr/1fr + el
+     padding de la página dejaba muy poco espacio real para cada
+     columna y todo se veía apretado/cortado. */
+  grid-template-columns: minmax(320px, 520px) 1fr;
+  gap: 48px;
+  margin-bottom: 60px;
+  align-items: start;
+}
+
+.pdet-media-col {
+  display: flex;
+  gap: 14px;
+}
+
+.pdet-media {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  border-radius: 24px;
+  overflow: hidden;
+  /* Proporción fija (4:5, estándar de foto de producto) en vez de un
+     min-height suelto — así el tamaño de la foto grande es siempre
+     predecible y las miniaturas (que ahora heredan esa misma altura,
+     ver .pdet-thumbs) tienen con qué alinearse. */
+  aspect-ratio: 4 / 5;
+  max-height: 640px;
+  padding: 22px;
+  box-sizing: border-box;
+  background: linear-gradient(155deg, color-mix(in srgb, var(--accent) 14%, var(--bg-elevated)), var(--bg));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pdet-thumbs {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  order: -1;
+  width: 78px;
+  flex-shrink: 0;
+}
+
+.pdet-zoom-btn {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: none;
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  transition: color 0.15s ease;
+}
+
+.pdet-zoom-btn:hover {
+  color: var(--accent);
+}
+
+.pdet-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.86);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  cursor: zoom-out;
+}
+
+.pdet-lightbox img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 12px;
+  cursor: default;
+}
+
+.pdet-lightbox-close {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.pdet-thumb {
+  /* Se reparten en partes iguales toda la altura de .pdet-media (78px
+     de ancho fijo, ver .pdet-thumbs) — con 2 fotos o con 6, siempre
+     llenan el alto completo de la foto grande, sin dejar hueco vacío
+     abajo. */
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  padding: 0;
+  cursor: pointer;
+  background: var(--bg-elevated);
+  transition: border-color 0.2s ease;
+}
+
+.pdet-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.pdet-thumb:hover {
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+}
+
+.pdet-thumb.active {
+  border-color: var(--accent);
+}
+
+.pdet-media img {
+  width: 100%;
+  height: 100%;
+  /* "cover" (como en el hero) recorta cuando la foto real no coincide
+     con la proporción del cuadro — con fotos de producto subidas por
+     cada vendedor eso significa a veces perder medio zapato. "contain"
+     siempre muestra el producto completo, con el fondo de marca de
+     relleno alrededor si hace falta — más seguro cuando no controlamos
+     la proporción real de cada foto. */
+  object-fit: contain;
+}
+
+.pdet-ph {
+  font-size: 15px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 0 24px;
+}
+
+.pdet-discount-tag {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: #dc6a5c;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.pdet-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.pdet-category {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.pdet-info h1 {
+  font-size: clamp(26px, 3.4vw, 38px);
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+}
+
+.pdet-rating-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+  width: fit-content;
+}
+
+.pdet-rating-link:hover {
+  color: var(--accent);
+}
+
+.pdet-rating-count {
+  font-size: 12.5px;
+}
+
+.pdet-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.pdet-price {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--accent-strong);
+}
+
+.pdet-price-original {
+  font-size: 16px;
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.pdet-stock {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.pdet-stock-low {
+  color: #d9a441;
+}
+
+.pdet-stock-out {
+  color: #dc6a5c;
+}
+
+.pdet-shipping-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+
+.pdet-shipping-line svg {
+  flex-shrink: 0;
+  color: var(--accent);
+}
+
+.pdet-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 0 0 22px;
+}
+
+.pdet-description {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-muted);
+  white-space: pre-line;
+}
+
+.pdet-tab-empty {
+  font-size: 13.5px;
+  color: var(--text-muted);
+}
+
+.pdet-variant-row {
+  margin-bottom: 18px;
+}
+
+.pdet-variant-label {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.pdet-variant-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pdet-variant-tag {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.pdet-variant-btn {
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+}
+
+.pdet-variant-btn:hover {
+  border-color: var(--accent);
+}
+
+.pdet-variant-btn.active {
+  background: var(--text);
+  color: var(--bg);
+  border-color: var(--text);
+}
+
+.pdet-variant-hint {
+  font-size: 12.5px;
+  color: #d9a441;
+  margin: -8px 0 16px;
+}
+
+.pdet-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pdet-swatch {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  cursor: pointer;
+  padding: 0;
+  box-shadow: inset 0 0 0 2px var(--bg-elevated);
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.pdet-swatch:hover {
+  transform: scale(1.08);
+}
+
+.pdet-swatch.active {
+  border-color: var(--accent);
+}
+
+.pdet-size-guide-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--text-muted);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.pdet-size-guide-btn:hover {
+  color: var(--accent);
+}
+
+.pdet-size-guide-text {
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.pdet-trust-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 24px 0;
+  padding: 18px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.pdet-trust-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 11.5px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.pdet-trust-item svg {
+  flex-shrink: 0;
+  color: var(--accent);
+  margin-top: 1px;
+}
+
+.pdet-trust-item strong {
+  display: block;
+  color: var(--text);
+  font-size: 12.5px;
+  margin-bottom: 2px;
+}
+
+.pdet-highlight {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 18px 20px;
+  border-radius: 16px;
+  background: linear-gradient(155deg, color-mix(in srgb, var(--accent) 12%, var(--bg-elevated)), var(--bg-elevated));
+  border: 1px solid var(--border);
+  margin-bottom: 28px;
+}
+
+.pdet-highlight svg {
+  flex-shrink: 0;
+  color: var(--accent);
+  margin-top: 2px;
+}
+
+.pdet-highlight strong {
+  display: block;
+  font-size: 13.5px;
+  margin-bottom: 4px;
+}
+
+.pdet-highlight p {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.pdet-tabs {
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+}
+
+.pdet-tabs-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.pdet-tab-btn {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 10px 4px 12px;
+  margin-right: 22px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.pdet-tab-btn:hover {
+  color: var(--text);
+}
+
+.pdet-tab-btn.active {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+
+.pdet-details-list,
+.pdet-shipping-list {
+  list-style: none;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.pdet-details-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.pdet-details-list li:last-child {
+  border-bottom: none;
+}
+
+.pdet-details-list li span:first-child {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.pdet-details-list li span:last-child {
+  text-align: right;
+}
+
+.pdet-shipping-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  line-height: 1.6;
+}
+
+.pdet-shipping-list li {
+  padding-left: 18px;
+  position: relative;
+}
+
+.pdet-shipping-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.pdet-qty {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 8px 16px;
+  margin-bottom: 16px;
+  width: fit-content;
+}
+
+.pdet-qty button {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.pdet-qty button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pdet-qty span {
+  min-width: 20px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.pdet-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 32px;
+  border-radius: 999px;
+  border: none;
+  background: var(--accent);
+  color: var(--bg);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  width: fit-content;
+}
+
+.pdet-add-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--border);
+  color: var(--text-muted);
+}
+
+.pdet-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
+.pdet-wish-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 20px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  width: fit-content;
+  margin-bottom: 16px;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.pdet-wish-btn:hover {
+  border-color: #dc6a5c;
+}
+
+.pdet-wish-btn.active {
+  border-color: #dc6a5c;
+  color: #dc6a5c;
+}
+
+.pdet-state-msg {
+  padding: 80px 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.pdet-state-error {
+  color: #dc6a5c;
+}
+
+.pdet-link-btn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 6px;
+}
+
+.pdet-empty {
+  text-align: center;
+  padding: 80px 24px;
+  color: var(--text-muted);
+}
+
+.pdet-empty p {
+  margin-bottom: 20px;
+  font-size: 15px;
+}
+
+.pdet-btn-primary {
+  display: inline-block;
+  padding: 12px 26px;
+  border-radius: 999px;
+  background: var(--text);
+  color: var(--bg);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.pdet-link-btn-danger {
+  color: #dc6a5c;
+}
+
+/* ---- Reseñas ---- */
+
+.pdet-reviews {
+  max-width: 720px;
+  margin-bottom: 64px;
+}
+
+.pdet-reviews h2 {
+  font-size: 22px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+
+.pdet-my-review {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-bottom: 24px;
+  background: var(--bg-elevated);
+}
+
+.pdet-my-review-label {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.pdet-my-review-comment {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--text);
+  margin-top: 10px;
+}
+
+.pdet-my-review-actions {
+  margin-top: 12px;
+}
+
+.pdet-my-review-actions .pdet-link-btn {
+  margin-left: 0;
+  margin-right: 16px;
+  font-size: 13px;
+}
+
+.pdet-review-form {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 32px;
+}
+
+.pdet-review-form-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+.rv-star-picker {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 14px;
+}
+
+.rv-star-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--border);
+  padding: 2px;
+  transition: color 0.15s ease;
+}
+
+.rv-star-btn.filled {
+  color: #d9a441;
+}
+
+.pdet-review-form textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 80px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 13.5px;
+  font-family: inherit;
+  margin-bottom: 12px;
+}
+
+.pdet-review-form textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.pdet-review-error {
+  font-size: 12.5px;
+  color: #dc6a5c;
+  margin-bottom: 12px;
+}
+
+.pdet-review-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.pdet-review-form-actions .pdet-btn-primary {
+  border: none;
+  cursor: pointer;
+}
+
+.pdet-review-form-actions .pdet-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.pdet-review-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.pdet-review-item {
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--border);
+}
+
+.pdet-review-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.pdet-review-item-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.pdet-review-author {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.pdet-review-date {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.pdet-review-comment {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.pdet-review-item .pdet-link-btn {
+  margin-left: 0;
+  margin-top: 8px;
+  font-size: 12.5px;
+}
+
+.pdet-review-pagination {
+  display: flex;
+  gap: 8px;
+  margin-top: 28px;
+}
+
+.pdet-page-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+.pdet-page-btn.active {
+  background: var(--text);
+  color: var(--bg);
+  border-color: var(--text);
+}
+
+/* Pantallas medianas (laptop chico / ventana no maximizada): antes
+   pdet-layout seguía siendo 1fr/1fr recién hasta los 860px, así que
+   entre ~860 y ~1180px el padding de 80px a cada lado + el gap de
+   48px dejaban muy poco ancho real para cada columna y el texto se
+   veía apretado/cortado. */
+@media (max-width: 1180px) {
+  .pdet-page {
+    padding: 44px 40px 80px;
+  }
+
+  .pdet-layout {
+    grid-template-columns: minmax(280px, 400px) 1fr;
+    gap: 32px;
+  }
+}
+
+@media (max-width: 860px) {
+  .pdet-page {
+    padding: 36px 24px 60px;
+  }
+
+  .pdet-layout {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .pdet-media-col {
+    flex-direction: column;
+  }
+
+  .pdet-thumbs {
+    flex-direction: row;
+    flex-wrap: wrap;
+    order: 1;
+    width: auto;
+  }
+
+  .pdet-thumb {
+    flex: 0 0 64px;
+    width: 64px;
+    height: 64px;
+  }
+
+  .pdet-media {
+    aspect-ratio: 1 / 1;
+    max-height: 420px;
+  }
+
+  .pdet-trust-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}

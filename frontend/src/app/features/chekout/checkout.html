@@ -1,0 +1,750 @@
+<section class="co-page">
+
+  @if (createdOrder(); as order) {
+
+    <!-- ===== ¡Listo! ===== -->
+    <div class="co-done">
+      <div class="co-done-icon">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m5 12 5 5 9-10"/></svg>
+      </div>
+      <h1 class="font-display">¡Pedido #{{ order.id }} creado!</h1>
+      <p class="co-done-sub">Tu pedido quedó pendiente de pago. Lo confirmaremos apenas verifiquemos tu operación.</p>
+
+      <div class="co-card co-done-card">
+        <div class="co-done-row"><span>Método de pago</span><strong>{{ methodLabel(paymentMethod()) }}</strong></div>
+        <div class="co-done-row"><span>Total a pagar</span><strong class="font-mono">S/ {{ (order.total ?? total()) | number: '1.2-2' }}</strong></div>
+
+        @if (accountRows().length > 0) {
+          <div class="co-account">
+            @for (row of accountRows(); track row.label) {
+              <div class="co-account-row">
+                <span>{{ row.label }}</span>
+                <strong class="font-mono">{{ row.value }}</strong>
+                <button type="button" class="co-copy" (click)="copy(row.value)">{{ copied() === row.value ? '¡Copiado!' : 'Copiar' }}</button>
+              </div>
+            }
+          </div>
+        }
+
+        <div class="co-ref-box">
+          @if (refSaved()) {
+            <p class="co-ref-ok">✓ Número de operación enviado{{ createdPayment()?.reference ? ': ' + createdPayment()?.reference : '' }}</p>
+          } @else {
+            <label for="co-ref-after">Después de pagar, ingresa tu número de operación</label>
+            <div class="co-ref-row">
+              <input #refAfter id="co-ref-after" type="text" placeholder="Ej. 123456" (keyup.enter)="attachReference(refAfter.value)" />
+              <button type="button" class="co-btn-primary" [disabled]="refBusy()" (click)="attachReference(refAfter.value)">
+                {{ refBusy() ? 'Enviando...' : 'Enviar' }}
+              </button>
+            </div>
+            @if (refError()) { <p class="co-error-inline">{{ refError() }}</p> }
+            <p class="co-hint">También puedes hacerlo luego desde Mi cuenta → Pedidos.</p>
+          }
+        </div>
+      </div>
+
+      <div class="co-done-actions">
+        <button type="button" class="co-btn-primary" (click)="goToOrders()">Ver mis pedidos</button>
+        <a class="co-btn-secondary" routerLink="/products">Seguir comprando</a>
+      </div>
+    </div>
+
+  } @else if (cart.items().length === 0) {
+
+    <div class="co-empty">
+      <p>Tu carrito está vacío.</p>
+      <a class="co-btn-secondary" routerLink="/products">Ver catálogo</a>
+    </div>
+
+  } @else {
+
+    <header class="co-head">
+      <div>
+        <h1 class="font-display">Finalizar pedido</h1>
+        <p class="co-head-sub">Completa tus datos, elige cómo pagar y confirma.</p>
+      </div>
+      <span class="co-secure">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        Pago seguro
+      </span>
+    </header>
+
+    <div class="co-layout">
+
+      <div class="co-card co-main">
+
+        <!-- Stepper -->
+        <ol class="co-steps">
+          <li [class.active]="step() === 1" [class.done]="step() > 1" (click)="goTo(1)">
+            <span class="co-step-dot">@if (step() > 1) { ✓ } @else { 1 }</span>
+            <span class="co-step-text"><strong>Entrega</strong><small>Dónde recibes</small></span>
+          </li>
+          <li [class.active]="step() === 2" [class.done]="step() > 2" (click)="goTo(2)">
+            <span class="co-step-dot">@if (step() > 2) { ✓ } @else { 2 }</span>
+            <span class="co-step-text"><strong>Pago</strong><small>Elige un método</small></span>
+          </li>
+          <li [class.active]="step() === 3">
+            <span class="co-step-dot">3</span>
+            <span class="co-step-text"><strong>Confirmación</strong><small>Revisa y confirma</small></span>
+          </li>
+        </ol>
+
+        <div class="co-body">
+
+          <!-- Paso 1: entrega -->
+          @if (step() === 1) {
+            <form class="co-form" [formGroup]="form" (ngSubmit)="next()" novalidate>
+              <h2 class="co-section-title">Dirección de entrega</h2>
+              <p class="co-section-hint">Se guarda una copia en el pedido: si cambias tu dirección después, este pedido conserva la de ahora.</p>
+
+              <div class="co-grid">
+                <div class="co-field">
+                  <label for="co-fullName">Nombre completo</label>
+                  <input id="co-fullName" type="text" formControlName="fullName" autocomplete="name"
+                         [class.invalid]="form.controls.fullName.invalid && form.controls.fullName.touched" />
+                  @if (form.controls.fullName.invalid && form.controls.fullName.touched) { <p class="co-hint">Indica quién recibe el pedido.</p> }
+                </div>
+
+                <div class="co-field">
+                  <label for="co-phone">Teléfono</label>
+                  <input id="co-phone" type="tel" formControlName="phone" autocomplete="tel" placeholder="987654321"
+                         [class.invalid]="form.controls.phone.invalid && form.controls.phone.touched" />
+                  @if (form.controls.phone.invalid && form.controls.phone.touched) { <p class="co-hint">Ingresa un teléfono válido (7 a 15 dígitos).</p> }
+                </div>
+
+                <div class="co-field co-span">
+                  <label for="co-address">Dirección</label>
+                  <input id="co-address" type="text" formControlName="address" autocomplete="street-address" placeholder="Av. Principal 123"
+                         [class.invalid]="form.controls.address.invalid && form.controls.address.touched" />
+                  @if (form.controls.address.invalid && form.controls.address.touched) { <p class="co-hint">La dirección es obligatoria.</p> }
+                </div>
+
+                <div class="co-field">
+                  <label for="co-district">Distrito</label>
+                  <input id="co-district" type="text" formControlName="district" autocomplete="address-level2"
+                         [class.invalid]="form.controls.district.invalid && form.controls.district.touched" />
+                  @if (form.controls.district.invalid && form.controls.district.touched) { <p class="co-hint">El distrito es obligatorio.</p> }
+                </div>
+
+                <div class="co-field">
+                  <label for="co-reference">Referencia <span class="co-optional">(opcional)</span></label>
+                  <input id="co-reference" type="text" formControlName="reference" placeholder="Frente al parque, portón verde..." />
+                </div>
+              </div>
+
+              <div class="co-nav">
+                <span></span>
+                <button type="submit" class="co-btn-primary">Continuar al pago</button>
+              </div>
+            </form>
+          }
+
+          <!-- Paso 2: pago -->
+          <!-- Paso 2: pago -->
+          @if (step() === 2) {
+            <div class="co-payment-step">
+
+              <!-- Encabezado -->
+              <div class="co-payment-heading">
+                <div>
+                  <div class="co-title-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="5" width="18" height="14" rx="3"/>
+                      <path d="M3 10h18"/>
+                      <path d="M7 15h3"/>
+                    </svg>
+                  </div>
+
+                  <div>
+                    <h2 class="co-section-title">Método de pago</h2>
+                    <p class="co-section-hint">
+                      Elige cómo quieres realizar el pago de tu pedido.
+                    </p>
+                  </div>
+                </div>
+
+                <span class="co-payment-secure">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="5" y="10" width="14" height="10" rx="2"/>
+          <path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+        </svg>
+        Pago seguro
+      </span>
+              </div>
+
+
+              <!-- Métodos -->
+              <div class="co-methods" role="radiogroup" aria-label="Método de pago">
+
+                @for (m of methods; track m.value) {
+
+                  <button
+                    type="button"
+                    role="radio"
+                    class="co-method"
+                    [class.active]="paymentMethod() === m.value"
+                    [attr.aria-checked]="paymentMethod() === m.value"
+                    (click)="paymentMethod.set(m.value)"
+                  >
+
+                    <!-- Icono -->
+                    <span
+                      class="co-method-logo"
+                      [attr.data-m]="m.value"
+                    >
+
+            @if (m.value === 'YAPE') {
+
+              <img src="/assets/images/payment/yape.png" alt="Yape" />
+
+            } @else if (m.value === 'PLIN') {
+
+              <img src="/assets/images/payment/plin.png" alt="Plin" />
+
+            } @else {
+
+              <svg viewBox="0 0 48 48" aria-hidden="true">
+                <path
+                  d="M8 18h32M11 18v19M19 18v19M29 18v19M37 18v19M7 37h34M6 14l18-7 18 7"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+
+            }
+
+          </span>
+
+
+                    <!-- Información -->
+                    <span class="co-method-content">
+
+            <strong>
+              {{ m.label }}
+            </strong>
+
+            <small>
+              @if (m.value === 'YAPE') {
+                Paga desde tu celular
+              } @else if (m.value === 'PLIN') {
+                Escanea y paga
+              } @else {
+                Desde cualquier banco
+              }
+            </small>
+
+          </span>
+
+
+                    <!-- Check -->
+                    @if (paymentMethod() === m.value) {
+                      <span class="co-method-check">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <path d="m5 12 4 4L19 6"/>
+              </svg>
+            </span>
+                    }
+
+                  </button>
+
+                }
+
+              </div>
+
+
+              <!-- Panel de pago -->
+              <div class="co-pay-panel">
+
+                <!-- Header del método -->
+                <div class="co-pay-header">
+
+                  <div class="co-pay-brand">
+
+          <span
+            class="co-pay-brand-icon"
+            [attr.data-m]="paymentMethod()"
+          >
+
+            @if (paymentMethod() === 'YAPE') {
+              <img src="/assets/images/payment/yape.png" alt="Yape" />
+            } @else if (paymentMethod() === 'PLIN') {
+              <img src="/assets/images/payment/plin.png" alt="Plin" />
+            } @else {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 10h18"/>
+                <path d="M5 10v9M9 10v9M15 10v9M19 10v9"/>
+                <path d="M3 19h18M2 7l10-4 10 4"/>
+              </svg>
+            }
+
+          </span>
+
+                    <div>
+                      <h3>
+                        Paga con {{ selectedMethod()?.label }}
+                      </h3>
+
+                      <p>
+                        {{ selectedMethod()?.hint }}
+                      </p>
+                    </div>
+
+                  </div>
+
+                  <span class="co-payment-status">
+          <span></span>
+          Disponible
+        </span>
+
+                </div>
+
+
+                <!-- YAPE / PLIN -->
+                @if (paymentMethod() === 'YAPE' || paymentMethod() === 'PLIN') {
+
+                  <div class="co-digital-payment" [class.has-qr]="!!qrUrl()">
+
+                    <!-- QR -->
+                    @if (qrUrl()) {
+
+                      <div class="co-qr-box">
+
+                        <div class="co-qr-frame">
+                          <img
+                            [src]="qrUrl()"
+                            [alt]="'Código QR para pagar con ' + selectedMethod()?.label"
+                          />
+                        </div>
+
+                        <span class="co-qr-label">
+                Escanea para pagar
+              </span>
+
+                      </div>
+
+                    }
+
+
+                    <!-- Datos -->
+                    <div class="co-payment-data">
+
+            <span class="co-data-label">
+              Número {{ selectedMethod()?.label }}
+            </span>
+
+                      @if (accountRows().length > 0) {
+
+                        @for (row of accountRows(); track row.label) {
+
+                          <div class="co-number-card">
+
+                            <div class="co-number-icon">
+
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M6 2h12v20H6z"/>
+                                <path d="M9 18h6"/>
+                                <path d="M9 5h6"/>
+                              </svg>
+
+                            </div>
+
+                            <div class="co-number-content">
+
+                              <small>{{ row.label }}</small>
+
+                              <strong class="font-mono">
+                                {{ row.value }}
+                              </strong>
+
+                            </div>
+
+                            <button
+                              type="button"
+                              class="co-copy"
+                              (click)="copy(row.value)"
+                            >
+
+                              @if (copied() === row.value) {
+
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                  <path d="m5 12 4 4L19 6"/>
+                                </svg>
+
+                                ¡Copiado!
+
+                              } @else {
+
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                  <rect x="9" y="9" width="11" height="11" rx="2"/>
+                                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                </svg>
+
+                                Copiar
+
+                              }
+
+                            </button>
+
+                          </div>
+
+                        }
+
+                      }
+
+
+                      <div class="co-payment-amount">
+
+                        <span>Total a pagar</span>
+
+                        <strong class="font-mono">
+                          S/ {{ total() | number: '1.2-2' }}
+                        </strong>
+
+                      </div>
+
+
+                      <!-- Aviso -->
+                      <div class="co-payment-note">
+
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <circle cx="12" cy="12" r="9"/>
+                          <path d="M12 8v4"/>
+                          <path d="M12 16h.01"/>
+                        </svg>
+
+                        <span>
+                Realiza el pago exactamente por el monto indicado
+                para que podamos identificar tu operación.
+              </span>
+
+                      </div>
+
+                    </div>
+
+
+                    <!-- Pasos -->
+                    <div class="co-how-card">
+
+                      <h4>¿Cómo pagar?</h4>
+
+                      <ol class="co-how">
+
+                        <li>
+                          <span>1</span>
+                          <div>
+                            <strong>Abre {{ selectedMethod()?.label }}</strong>
+                            <small>Desde tu celular.</small>
+                          </div>
+                        </li>
+
+                        <li>
+                          <span>2</span>
+                          <div>
+                            <strong>Realiza el pago</strong>
+                            <small>
+                              Usa el número o escanea el QR si está disponible.
+                            </small>
+                          </div>
+                        </li>
+
+                        <li>
+                          <span>3</span>
+                          <div>
+                            <strong>Guarda tu operación</strong>
+                            <small>La necesitarás para verificar tu pago.</small>
+                          </div>
+                        </li>
+
+                      </ol>
+
+                    </div>
+
+                  </div>
+
+                }
+
+
+                <!-- TRANSFERENCIA -->
+                @if (paymentMethod() === 'TRANSFER') {
+
+                  <div class="co-transfer-panel">
+
+                    <div class="co-transfer-icon">
+
+                      <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4">
+                        <path d="M6 17h36"/>
+                        <path d="M9 17v21M17 17v21M31 17v21M39 17v21"/>
+                        <path d="M5 38h38"/>
+                        <path d="m6 13 18-7 18 7"/>
+                      </svg>
+
+                    </div>
+
+                    <div class="co-transfer-content">
+
+            <span class="co-data-label">
+              Datos para transferencia
+            </span>
+
+                      @if (accountRows().length > 0) {
+
+                        <div class="co-transfer-data">
+
+                          @for (row of accountRows(); track row.label) {
+
+                            <div class="co-transfer-row">
+
+                              <span>{{ row.label }}</span>
+
+                              <strong class="font-mono">
+                                {{ row.value }}
+                              </strong>
+
+                              <button
+                                type="button"
+                                class="co-copy"
+                                (click)="copy(row.value)"
+                              >
+                                {{ copied() === row.value ? '¡Copiado!' : 'Copiar' }}
+                              </button>
+
+                            </div>
+
+                          }
+
+                        </div>
+
+                      } @else {
+
+                        <div class="co-empty-payment-data">
+
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="9"/>
+                            <path d="M12 8v4"/>
+                            <path d="M12 16h.01"/>
+                          </svg>
+
+                          <span>
+                  Los datos bancarios estarán disponibles
+                  cuando estén configurados.
+                </span>
+
+                        </div>
+
+                      }
+
+                    </div>
+
+                  </div>
+
+                }
+
+
+                <!-- Número de operación -->
+                <div class="co-reference-card">
+
+                  <div class="co-reference-icon">
+
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M4 4h16v16H4z"/>
+                      <path d="M8 8h8M8 12h5M8 16h3"/>
+                    </svg>
+
+                  </div>
+
+                  <div class="co-reference-content">
+
+                    <label for="co-ref">
+                      Número de operación
+                      <span>(opcional ahora)</span>
+                    </label>
+
+                    <p>
+                      Puedes ingresarlo después desde Mi cuenta → Pedidos.
+                    </p>
+
+                    <input
+                      id="co-ref"
+                      type="text"
+                      [value]="paymentReference()"
+                      (input)="paymentReference.set($any($event.target).value)"
+                      placeholder="Ej. 123456789"
+                    />
+
+                  </div>
+
+                </div>
+
+
+                <!-- Seguridad -->
+                <div class="co-payment-trust">
+
+                  <div>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 3 5 6v5c0 5 3 8 7 10 4-2 7-5 7-10V6l-7-3Z"/>
+                      <path d="m9 12 2 2 4-4"/>
+                    </svg>
+
+                    <span>
+            <strong>Pago seguro</strong>
+            <small>Tus datos están protegidos</small>
+          </span>
+                  </div>
+
+                  <div>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M3 12h18"/>
+                      <path d="M12 3v18"/>
+                      <circle cx="12" cy="12" r="9"/>
+                    </svg>
+
+                    <span>
+            <strong>Verificación manual</strong>
+            <small>Confirmamos tu operación</small>
+          </span>
+                  </div>
+
+                  <div>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M3 12a9 9 0 1 0 3-6.7"/>
+                      <path d="M3 4v6h6"/>
+                    </svg>
+
+                    <span>
+            <strong>Soporte</strong>
+            <small>Te ayudamos con tu pedido</small>
+          </span>
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <!-- Navegación -->
+              <div class="co-nav">
+
+                <button
+                  type="button"
+                  class="co-btn-secondary"
+                  (click)="back()"
+                >
+                  ← Atrás
+                </button>
+
+                <button
+                  type="button"
+                  class="co-btn-primary co-btn-payment"
+                  (click)="next()"
+                >
+                  Revisar pedido
+
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M5 12h14"/>
+                    <path d="m13 6 6 6-6 6"/>
+                  </svg>
+
+                </button>
+
+              </div>
+
+            </div>
+          }
+          <!-- Paso 3: confirmación -->
+          @if (step() === 3) {
+            <div>
+              <h2 class="co-section-title">Revisa y confirma</h2>
+
+              <div class="co-review">
+                <div class="co-review-block">
+                  <div class="co-review-title">Entrega <button type="button" class="co-link" (click)="goTo(1)">Editar</button></div>
+                  <p>{{ form.getRawValue().fullName }} · {{ form.getRawValue().phone }}</p>
+                  <p>{{ form.getRawValue().address }}, {{ form.getRawValue().district }}</p>
+                  @if (form.getRawValue().reference) { <p class="co-muted">Ref.: {{ form.getRawValue().reference }}</p> }
+                </div>
+                <div class="co-review-block">
+                  <div class="co-review-title">Pago <button type="button" class="co-link" (click)="goTo(2)">Editar</button></div>
+                  <p>{{ selectedMethod()?.label }}{{ paymentReference().trim() ? ' · Operación ' + paymentReference().trim() : ' · Número de operación pendiente' }}</p>
+                </div>
+              </div>
+
+              @if (linesWithMissingVariant().length > 0) {
+                <p class="co-submit-hint">Elige color/talla en los productos marcados para poder continuar.</p>
+              }
+              @if (errorMsg()) { <div class="co-error" role="alert">{{ errorMsg() }}</div> }
+
+              <div class="co-nav">
+                <button type="button" class="co-btn-secondary" (click)="back()">Atrás</button>
+                <button type="button" class="co-btn-primary" [disabled]="!canSubmit()" (click)="submit()">
+                  {{ submitting() ? 'Generando pedido...' : 'Confirmar pedido · S/ ' + (total() | number: '1.2-2') }}
+                </button>
+              </div>
+            </div>
+          }
+
+        </div>
+      </div>
+
+      <!-- Resumen -->
+      <aside class="co-card co-summary">
+        <div class="co-summary-head">
+          <h2 class="co-section-title">Resumen del pedido</h2>
+          <span class="co-pill">{{ cart.itemCount() }} {{ cart.itemCount() === 1 ? 'producto' : 'productos' }}</span>
+        </div>
+
+        <div class="co-lines">
+          @for (item of cart.items(); track item.product.id + '::' + (item.selectedColor ?? '') + '::' + (item.selectedSize ?? '')) {
+            <div class="co-line" [class.co-line-warn]="cart.missingVariant(item)">
+              <div class="co-thumb">
+                @if (item.product.imageUrl) { <img [src]="item.product.imageUrl | imageUrl" [alt]="item.product.name" /> }
+                @else { <span>{{ item.product.name.charAt(0) }}</span> }
+              </div>
+              <div class="co-line-info">
+                <p class="co-line-name">{{ item.product.name }}</p>
+                @if (cart.missingVariant(item)) {
+                  <p class="co-line-missing">Falta elegir {{ missingLabel(item) }} — <a [routerLink]="['/products', item.product.id]">elegir ahora</a></p>
+                } @else if (item.selectedColor || item.selectedSize) {
+                  <p class="co-line-variant">{{ variantLabel(item) }}</p>
+                }
+                <p class="co-line-qty">{{ item.quantity }} × S/ {{ effectivePrice(item.product) | number: '1.2-2' }}</p>
+              </div>
+              <span class="co-line-total font-mono">S/ {{ effectivePrice(item.product) * item.quantity | number: '1.2-2' }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="co-coupon">
+          @if (appliedCoupon(); as c) {
+            <div class="co-coupon-applied">
+              <span>Cupón <strong>{{ c.code }}</strong> aplicado</span>
+              <button type="button" (click)="removeCoupon()">Quitar</button>
+            </div>
+          } @else {
+            <div class="co-coupon-row">
+              <input type="text" placeholder="Código de cupón" [value]="couponInput()"
+                     (input)="couponInput.set($any($event.target).value)" (keyup.enter)="applyCoupon()" />
+              <button type="button" [disabled]="couponBusy() || !couponInput().trim()" (click)="applyCoupon()">{{ couponBusy() ? '...' : 'Aplicar' }}</button>
+            </div>
+          }
+          @if (couponMsg()) { <p class="co-coupon-msg">{{ couponMsg() }}</p> }
+        </div>
+
+        <div class="co-totals">
+          <div class="co-total-row"><span>Subtotal</span><span class="font-mono">S/ {{ cart.subtotal() | number: '1.2-2' }}</span></div>
+          @if (discount() > 0) {
+            <div class="co-total-row co-discount"><span>Cupón {{ appliedCoupon()?.code }}</span><span class="font-mono">− S/ {{ discount() | number: '1.2-2' }}</span></div>
+          }
+          <div class="co-total-row"><span>Envío</span><span class="font-mono">{{ shippingCost() === 0 ? 'Gratis' : 'S/ ' + (shippingCost() | number: '1.2-2') }}</span></div>
+          <div class="co-total-row co-total-final"><span>Total</span><span class="font-mono">S/ {{ total() | number: '1.2-2' }}</span></div>
+        </div>
+
+        <p class="co-safe">🔒 Tu información está protegida.</p>
+      </aside>
+
+    </div>
+  }
+
+</section>

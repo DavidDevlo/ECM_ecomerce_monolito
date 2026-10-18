@@ -1,0 +1,814 @@
+<section class="pf-page">
+
+  @if (loading()) {
+    <p class="pf-state-msg">Cargando tu perfil...</p>
+  } @else if (loadError()) {
+    <p class="pf-state-msg pf-state-error">
+      No se pudo cargar tu información.
+      <button class="pf-link-btn" type="button" (click)="loadIdentity()">Reintentar</button>
+    </p>
+  } @else {
+
+    <!-- Encabezado -->
+    <header class="pf-header">
+      <div class="pf-identity">
+        <div class="pf-avatar">{{ initials() }}</div>
+        <div>
+          <p class="pf-greeting font-display">¡Hola, {{ firstName() }}!</p>
+          <p class="pf-subtitle">{{ viewSubtitle() }}</p>
+        </div>
+      </div>
+
+      <div class="pf-header-right">
+        <span class="pf-date-badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2"/>
+            <path d="M16 2v4M8 2v4M3 10h18"/>
+          </svg>
+          {{ todayLabel() }}
+        </span>
+        <button class="pf-btn-logout" type="button" (click)="logout()">Cerrar sesión</button>
+      </div>
+    </header>
+
+    <!-- KPIs -->
+    <div class="pf-kpi-row">
+      @for (tile of activeKpis(); track tile.label) {
+        <div class="pf-kpi-tile">
+          <div class="pf-kpi-icon" [class]="tile.colorClass">
+            @switch (tile.icon) {
+              @case ('box') {
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="m21 8-9-5-9 5 9 5 9-5Z"/>
+                  <path d="M3 8v8l9 5 9-5V8M12 13v8"/>
+                </svg>
+              }
+              @case ('clock') {
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <circle cx="12" cy="12" r="9"/>
+                  <path d="M12 7v5l3.5 2"/>
+                </svg>
+              }
+              @case ('truck') {
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <rect x="1" y="6" width="13" height="11" rx="1.5"/>
+                  <path d="M14 10h4l3 3.5V17h-7z"/>
+                  <circle cx="6" cy="19.5" r="1.7"/>
+                  <circle cx="17.5" cy="19.5" r="1.7"/>
+                </svg>
+              }
+              @case ('check') {
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <circle cx="12" cy="12" r="9"/>
+                  <path d="m8.5 12.5 2.3 2.3L16 10"/>
+                </svg>
+              }
+              @case ('users') {
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <circle cx="9" cy="8" r="3.2"/>
+                  <path d="M2.5 19c.7-3.4 3.3-5.4 6.5-5.4s5.8 2 6.5 5.4"/>
+                  <circle cx="17.5" cy="8.5" r="2.4"/>
+                  <path d="M16 13.8c2.4.3 4.2 2 4.8 4.7"/>
+                </svg>
+              }
+              @case ('layers') {
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="m12 3 9 5-9 5-9-5 9-5Z"/>
+                  <path d="m3 13 9 5 9-5"/>
+                </svg>
+              }
+              @case ('chart') {
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M3 3v18h18"/>
+                  <path d="M7 15l4-5 3 3 5-7"/>
+                </svg>
+              }
+            }
+          </div>
+          <div class="pf-kpi-body">
+            <span class="pf-kpi-value font-mono">{{ tile.value }}</span>
+            <span class="pf-kpi-label">{{ tile.label }}</span>
+            <div class="pf-kpi-caption-row">
+              @if (tile.trend) {
+                <span class="pf-kpi-trend" [class.pf-trend-neg]="!tile.trend.positive">
+                  {{ tile.trend.positive ? '↑' : '↓' }} {{ tile.trend.label }}
+                </span>
+              }
+              <span class="pf-kpi-caption">{{ tile.caption }}</span>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Grilla principal: tabla + panel lateral -->
+    <div class="pf-grid">
+      <div class="pf-main-col">
+
+        @if (viewMode.activeView() === 'CLIENTE') {
+
+          <div class="pf-card pf-table-card">
+            <div class="pf-table-card-header">
+              <div>
+                <h2 class="font-display">Mis pedidos</h2>
+                <p class="pf-table-subtitle">Consulta el estado y detalle de tus compras.</p>
+              </div>
+
+              @if (orders().length > 0) {
+                <div class="pf-table-controls">
+                  <div class="pf-search">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="11" cy="11" r="8"/>
+                      <path d="m21 21-4.35-4.35"/>
+                    </svg>
+                    <input
+                      #buyerSearchInput
+                      type="text"
+                      placeholder="Buscar por # de pedido..."
+                      (input)="onBuyerSearchInput(buyerSearchInput.value)"
+                    />
+                  </div>
+                  <select #buyerStatusSelect class="pf-status-select" (change)="onBuyerStatusFilterChange(buyerStatusSelect.value)">
+                    <option value="ALL">Todos los estados</option>
+                    <option [value]="OrderStatus.PENDING">Pendiente</option>
+                    <option [value]="OrderStatus.PAID">Pagado</option>
+                    <option [value]="OrderStatus.CONFIRMED">Confirmado</option>
+                    <option [value]="OrderStatus.PREPARING">Preparando</option>
+                    <option [value]="OrderStatus.SHIPPED">En camino</option>
+                    <option [value]="OrderStatus.DELIVERED">Entregado</option>
+                    <option [value]="OrderStatus.CANCELLED">Cancelado</option>
+                  </select>
+                </div>
+              }
+            </div>
+
+            @if (actionError()) {
+              <div class="pf-action-error">{{ actionError() }}</div>
+            }
+
+            @if (buyerLoading()) {
+              <p class="pf-state-msg">Cargando pedidos...</p>
+            } @else if (buyerError()) {
+              <p class="pf-state-msg pf-state-error">
+                No se pudo cargar tu historial de pedidos.
+                <button class="pf-link-btn" type="button" (click)="loadBuyerOrders()">Reintentar</button>
+              </p>
+            } @else if (orders().length === 0) {
+              <div class="pf-empty">
+                <p>Todavía no tienes pedidos.</p>
+                <a routerLink="/products" class="pf-btn-primary">Explorar catálogo</a>
+              </div>
+            } @else if (filteredOrders().length === 0) {
+              <p class="pf-state-msg">Ningún pedido coincide con tu búsqueda.</p>
+            } @else {
+
+              <div class="pf-table-wrap">
+                <table class="pf-table">
+                  <thead>
+                  <tr>
+                    <th>#Pedido</th>
+                    <th>Productos</th>
+                    <th>Total</th>
+                    <th>Estado</th>
+                    <th>Fecha</th>
+                    <th class="pf-col-actions">Acciones</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                    @for (order of pagedBuyerOrders(); track order.id) {
+                      <tr class="pf-table-row">
+                        <td class="pf-cell-id">#{{ order.id }}</td>
+                        <td>
+                          <div class="pf-product-cell">
+                            <div class="pf-product-thumb">
+                              @if (primaryProduct(order); as product) {
+                                @if (product.imageUrl) {
+                                  <img [src]="product.imageUrl | imageUrl" [alt]="product.name" />
+                                } @else {
+                                  <span>{{ product.name.charAt(0) }}</span>
+                                }
+                              } @else {
+                                <span>?</span>
+                              }
+                            </div>
+                            <div class="pf-product-info">
+                              @if (primaryProduct(order); as product) {
+                                <p class="pf-product-name">{{ product.name }}</p>
+                              }
+                              @if (order.orderDetails.length > 1) {
+                                <p class="pf-product-more">+{{ order.orderDetails.length - 1 }} más</p>
+                              }
+                            </div>
+                          </div>
+                        </td>
+                        <td class="font-mono">S/ {{ orderTotal(order) | number: '1.2-2' }}</td>
+                        <td><span class="pf-badge" [class]="statusClass(order.status)">{{ statusLabel(order.status) }}</span></td>
+                        <td class="pf-cell-muted">{{ formatDate(order.orderDate) }}</td>
+                        <td>
+                          <button class="pf-btn-detail" type="button" (click)="toggleExpand(order.id)">
+                            {{ expandedOrderId() === order.id ? 'Ocultar' : 'Ver detalle' }}
+                          </button>
+                        </td>
+                      </tr>
+
+                      @if (expandedOrderId() === order.id) {
+                        <tr class="pf-detail-tr">
+                          <td colspan="6">
+                            <div class="pf-order-details">
+
+                              <app-order-tracker [status]="order.status" />
+
+                              @for (detail of order.orderDetails; track detail.id) {
+                                <div class="pf-detail-row">
+                                  <div class="pf-detail-thumb">
+                                    @if (detail.product.imageUrl) {
+                                      <img [src]="detail.product.imageUrl | imageUrl" [alt]="detail.product.name" />
+                                    } @else {
+                                      <span>{{ detail.product.name.charAt(0) }}</span>
+                                    }
+                                  </div>
+                                  <div class="pf-detail-info">
+                                    <p class="pf-detail-name">{{ detail.product.name }}</p>
+                                    @if (detail.color || detail.size) {
+                                      <p class="pf-detail-variant">{{ detail.color }}{{ detail.color && detail.size ? ' · ' : '' }}{{ detail.size ? 'Talla ' + detail.size : '' }}</p>
+                                    }
+                                    <p class="pf-detail-qty">
+                                      {{ detail.quantity }} × S/ {{ detail.unitPrice | number: '1.2-2' }}
+                                    </p>
+                                  </div>
+                                  <p class="pf-detail-subtotal font-mono">
+                                    S/ {{ detail.quantity * detail.unitPrice | number: '1.2-2' }}
+                                  </p>
+                                </div>
+                              }
+
+                              <app-order-shipping [address]="order.shippingAddress" />
+                              <app-order-payment [orderId]="order.id" mode="client" />
+
+                              @if (order.discountAmount) {
+                                <p class="pf-detail-variant">Cupón {{ order.couponCode }}: − S/ {{ order.discountAmount | number: '1.2-2' }}</p>
+                              }
+                              @if (order.shippingCost != null) {
+                                <p class="pf-detail-variant">Envío: {{ order.shippingCost === 0 ? 'Gratis' : 'S/ ' + (order.shippingCost | number: '1.2-2') }}</p>
+                              }
+                              <div class="pf-order-total">
+                                <span>Total</span>
+                                <span class="font-mono">S/ {{ orderTotal(order) | number: '1.2-2' }}</span>
+                              </div>
+
+                              @if (order.status === OrderStatus.PENDING) {
+                                <div class="pf-order-cancel">
+                                  @if (confirmingCancelId() === order.id) {
+                                    <span class="pf-cancel-confirm-text">¿Cancelar este pedido?</span>
+                                    <button
+                                      class="pf-btn-danger-sm"
+                                      type="button"
+                                      [disabled]="cancellingId() === order.id"
+                                      (click)="confirmCancel(order.id)"
+                                    >
+                                      Sí, cancelar
+                                    </button>
+                                    <button class="pf-btn-ghost-sm" type="button" (click)="cancelCancel()">No</button>
+                                  } @else {
+                                    <button class="pf-btn-cancel" type="button" (click)="askCancel(order.id)">
+                                      Cancelar pedido
+                                    </button>
+                                  }
+                                </div>
+                              }
+
+                            </div>
+                          </td>
+                        </tr>
+                      }
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="pf-pagination">
+                <span class="pf-pagination-info">
+                  Mostrando {{ pagedBuyerOrders().length }} de {{ filteredOrders().length }} pedidos
+                </span>
+                <div class="pf-pagination-controls">
+                  <button type="button" [disabled]="buyerPage() === 0" (click)="goToBuyerPage(buyerPage() - 1)">‹</button>
+                  @for (p of pageNumbers(buyerTotalPages()); track p) {
+                    <button type="button" [class.active]="buyerPage() === p" (click)="goToBuyerPage(p)">{{ p + 1 }}</button>
+                  }
+                  <button type="button" [disabled]="buyerPage() >= buyerTotalPages() - 1" (click)="goToBuyerPage(buyerPage() + 1)">›</button>
+                </div>
+              </div>
+            }
+          </div>
+
+        } @else if (viewMode.activeView() === 'VENDEDOR') {
+
+          <div class="pf-card pf-table-card">
+            <div class="pf-table-card-header">
+              <div>
+                <h2 class="font-display">Pedidos</h2>
+                <p class="pf-table-subtitle">Gestiona los pedidos de tus clientes y mantén el flujo de ventas.</p>
+              </div>
+
+              @if (sellerCombined().length > 0) {
+                <div class="pf-table-controls">
+                  <div class="pf-search">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="11" cy="11" r="8"/>
+                      <path d="m21 21-4.35-4.35"/>
+                    </svg>
+                    <input
+                      #sellerSearchInput
+                      type="text"
+                      placeholder="Buscar por # de pedido o cliente..."
+                      (input)="onSellerSearchInput(sellerSearchInput.value)"
+                    />
+                  </div>
+                  <select #sellerStatusSelect class="pf-status-select" (change)="onSellerStatusFilterChange(sellerStatusSelect.value)">
+                    <option value="ALL">Todos los estados</option>
+                    <option [value]="OrderStatus.PENDING">Pendiente</option>
+                    <option [value]="OrderStatus.PAID">Pagado</option>
+                    <option [value]="OrderStatus.CONFIRMED">Confirmado</option>
+                    <option [value]="OrderStatus.PREPARING">Preparando</option>
+                    <option [value]="OrderStatus.SHIPPED">En camino</option>
+                    <option [value]="OrderStatus.DELIVERED">Entregado</option>
+                    <option [value]="OrderStatus.CANCELLED">Cancelado</option>
+                  </select>
+                </div>
+              }
+            </div>
+
+            @if (sellerActionError()) {
+              <div class="pf-action-error">{{ sellerActionError() }}</div>
+            }
+
+            @if (archivedCount() > 0) {
+              <button class="pf-archive-toggle" type="button" (click)="toggleShowArchived()">
+                {{ showArchived()
+                ? 'Ocultar cerrados de hace más de 30 días'
+                : archivedCount() + ' ' + (archivedCount() === 1 ? 'pedido cerrado oculto' : 'pedidos cerrados ocultos') + ' (+30 días) · Mostrar' }}
+              </button>
+            }
+
+            @if (sellerLoading()) {
+              <p class="pf-state-msg">Cargando pedidos...</p>
+            } @else if (sellerError()) {
+              <p class="pf-state-msg pf-state-error">
+                No se pudo cargar la información de vendedor.
+                <button class="pf-link-btn" type="button" (click)="loadSellerData()">Reintentar</button>
+              </p>
+            } @else if (sellerCombined().length === 0) {
+              <p class="pf-state-msg">Todavía no tienes pedidos disponibles ni asignados.</p>
+            } @else if (filteredSellerOrders().length === 0) {
+              <p class="pf-state-msg">Ningún pedido coincide con tu búsqueda.</p>
+            } @else {
+
+              <div class="pf-table-wrap">
+                <table class="pf-table">
+                  <thead>
+                  <tr>
+                    <th>#Pedido</th>
+                    <th>Cliente</th>
+                    <th>Productos</th>
+                    <th>Total</th>
+                    <th>Estado</th>
+                    <th>Fecha</th>
+                    <th class="pf-col-actions">Acciones</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                    @for (order of pagedSellerOrders(); track order.id) {
+                      <tr class="pf-table-row">
+                        <td class="pf-cell-id">#{{ order.id }}</td>
+                        <td class="pf-cell-muted">{{ order.user.username }}</td>
+                        <td>
+                          <div class="pf-product-cell">
+                            <div class="pf-product-thumb">
+                              @if (primaryProduct(order); as product) {
+                                @if (product.imageUrl) {
+                                  <img [src]="product.imageUrl | imageUrl" [alt]="product.name" />
+                                } @else {
+                                  <span>{{ product.name.charAt(0) }}</span>
+                                }
+                              } @else {
+                                <span>?</span>
+                              }
+                            </div>
+                            <div class="pf-product-info">
+                              @if (primaryProduct(order); as product) {
+                                <p class="pf-product-name">{{ product.name }}</p>
+                              }
+                              @if (order.orderDetails.length > 1) {
+                                <p class="pf-product-more">+{{ order.orderDetails.length - 1 }} más</p>
+                              }
+                            </div>
+                          </div>
+                        </td>
+                        <td class="font-mono">S/ {{ orderTotal(order) | number: '1.2-2' }}</td>
+                        <td><span class="pf-badge" [class]="statusClass(order.status)">{{ statusLabel(order.status) }}</span></td>
+                        <td class="pf-cell-muted">{{ formatDate(order.orderDate) }}</td>
+                        <td>
+                          @if (order.origin === 'available') {
+                            <button
+                              class="pf-btn-accept"
+                              type="button"
+                              [disabled]="acceptingId() === order.id"
+                              (click)="acceptOrder(order.id)"
+                            >
+                              {{ acceptingId() === order.id ? 'Aceptando...' : 'Aceptar' }}
+                            </button>
+                          } @else {
+                            <button class="pf-btn-detail" type="button" (click)="toggleExpand(order.id)">
+                              {{ expandedOrderId() === order.id ? 'Ocultar' : 'Ver detalle' }}
+                            </button>
+                          }
+                        </td>
+                      </tr>
+
+                      @if (expandedOrderId() === order.id && order.origin === 'assigned') {
+                        <tr class="pf-detail-tr">
+                          <td colspan="7">
+                            <div class="pf-order-details">
+
+                              <app-order-tracker [status]="order.status" />
+
+                              @for (detail of order.orderDetails; track detail.id) {
+                                <div class="pf-detail-row">
+                                  <div class="pf-detail-thumb">
+                                    @if (detail.product.imageUrl) {
+                                      <img [src]="detail.product.imageUrl | imageUrl" [alt]="detail.product.name" />
+                                    } @else {
+                                      <span>{{ detail.product.name.charAt(0) }}</span>
+                                    }
+                                  </div>
+                                  <div class="pf-detail-info">
+                                    <p class="pf-detail-name">{{ detail.product.name }}</p>
+                                    @if (detail.color || detail.size) {
+                                      <p class="pf-detail-variant">{{ detail.color }}{{ detail.color && detail.size ? ' · ' : '' }}{{ detail.size ? 'Talla ' + detail.size : '' }}</p>
+                                    }
+                                    <p class="pf-detail-qty">
+                                      {{ detail.quantity }} × S/ {{ detail.unitPrice | number: '1.2-2' }}
+                                    </p>
+                                  </div>
+                                  <p class="pf-detail-subtotal font-mono">
+                                    S/ {{ detail.quantity * detail.unitPrice | number: '1.2-2' }}
+                                  </p>
+                                </div>
+                              }
+
+                              <app-order-shipping [address]="order.shippingAddress" />
+                              <app-order-payment [orderId]="order.id" mode="staff" />
+
+                              @if (order.discountAmount) {
+                                <p class="pf-detail-variant">Cupón {{ order.couponCode }}: − S/ {{ order.discountAmount | number: '1.2-2' }}</p>
+                              }
+                              @if (order.shippingCost != null) {
+                                <p class="pf-detail-variant">Envío: {{ order.shippingCost === 0 ? 'Gratis' : 'S/ ' + (order.shippingCost | number: '1.2-2') }}</p>
+                              }
+                              <div class="pf-order-total">
+                                <span>Total</span>
+                                <span class="font-mono">S/ {{ orderTotal(order) | number: '1.2-2' }}</span>
+                              </div>
+
+                              @if (order.status === OrderStatus.CONFIRMED || order.status === OrderStatus.PREPARING) {
+                                <div class="pf-seller-actions">
+                                  <button
+                                    class="pf-btn-cancel"
+                                    type="button"
+                                    [disabled]="updatingStatusId() === order.id"
+                                    (click)="updateAssignedStatus(order, OrderStatus.CANCELLED)"
+                                  >
+                                    Cancelar
+                                  </button>
+                                  <button
+                                    class="pf-btn-accept"
+                                    type="button"
+                                    [disabled]="updatingStatusId() === order.id"
+                                    (click)="updateAssignedStatus(order, OrderStatus.SHIPPED)"
+                                  >
+                                    Marcar enviado
+                                  </button>
+                                </div>
+                              } @else if (order.status === OrderStatus.SHIPPED) {
+                                <div class="pf-seller-actions">
+                                  <button
+                                    class="pf-btn-accept"
+                                    type="button"
+                                    [disabled]="updatingStatusId() === order.id"
+                                    (click)="updateAssignedStatus(order, OrderStatus.DELIVERED)"
+                                  >
+                                    Marcar entregado
+                                  </button>
+                                </div>
+                              }
+
+                            </div>
+                          </td>
+                        </tr>
+                      }
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="pf-pagination">
+                <span class="pf-pagination-info">
+                  Mostrando {{ pagedSellerOrders().length }} de {{ filteredSellerOrders().length }} pedidos
+                </span>
+                <div class="pf-pagination-controls">
+                  <button type="button" [disabled]="sellerPage() === 0" (click)="goToSellerPage(sellerPage() - 1)">‹</button>
+                  @for (p of pageNumbers(sellerTotalPages()); track p) {
+                    <button type="button" [class.active]="sellerPage() === p" (click)="goToSellerPage(p)">{{ p + 1 }}</button>
+                  }
+                  <button type="button" [disabled]="sellerPage() >= sellerTotalPages() - 1" (click)="goToSellerPage(sellerPage() + 1)">›</button>
+                </div>
+              </div>
+            }
+          </div>
+
+        } @else if (viewMode.activeView() === 'ADMIN') {
+
+          <div class="pf-card pf-table-card">
+            <div class="pf-table-card-header">
+              <div>
+                <h2 class="font-display">Pedidos recientes</h2>
+                <p class="pf-table-subtitle">Vista de solo lectura de todo el sistema.</p>
+              </div>
+
+              <div class="pf-table-controls">
+                @if (adminOrders().length > 0) {
+                  <div class="pf-search">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="11" cy="11" r="8"/>
+                      <path d="m21 21-4.35-4.35"/>
+                    </svg>
+                    <input
+                      #adminSearchInput
+                      type="text"
+                      placeholder="Buscar # pedido, cliente o vendedor..."
+                      (input)="onAdminSearchInput(adminSearchInput.value)"
+                    />
+                  </div>
+                  <select #adminStatusSelect class="pf-status-select" (change)="onAdminStatusFilterChange(adminStatusSelect.value)">
+                    <option value="ALL">Todos los estados</option>
+                    <option [value]="OrderStatus.PENDING">Pendiente</option>
+                    <option [value]="OrderStatus.PAID">Pagado</option>
+                    <option [value]="OrderStatus.CONFIRMED">Confirmado</option>
+                    <option [value]="OrderStatus.PREPARING">Preparando</option>
+                    <option [value]="OrderStatus.SHIPPED">En camino</option>
+                    <option [value]="OrderStatus.DELIVERED">Entregado</option>
+                    <option [value]="OrderStatus.CANCELLED">Cancelado</option>
+                  </select>
+                }
+                <a class="pf-btn-manage" routerLink="/admin/orders">Gestionar pedidos</a>
+              </div>
+            </div>
+
+            @if (adminLoading()) {
+              <p class="pf-state-msg">Cargando resumen...</p>
+            } @else if (adminError()) {
+              <p class="pf-state-msg pf-state-error">
+                No se pudo cargar el resumen.
+                <button class="pf-link-btn" type="button" (click)="loadAdminOverview()">Reintentar</button>
+              </p>
+            } @else if (adminOrders().length === 0) {
+              <p class="pf-state-msg">Todavía no hay pedidos en el sistema.</p>
+            } @else if (filteredAdminOrders().length === 0) {
+              <p class="pf-state-msg">Ningún pedido coincide con tu búsqueda.</p>
+            } @else {
+
+              <div class="pf-table-wrap">
+                <table class="pf-table">
+                  <thead>
+                  <tr>
+                    <th>#Pedido</th>
+                    <th>Cliente</th>
+                    <th>Vendedor</th>
+                    <th>Total</th>
+                    <th>Estado</th>
+                    <th>Fecha</th>
+                    <th class="pf-col-actions">Acciones</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                    @for (order of pagedAdminOrders(); track order.id) {
+                      <tr class="pf-table-row">
+                        <td class="pf-cell-id">#{{ order.id }}</td>
+                        <td class="pf-cell-muted">{{ order.user.username }}</td>
+                        <td class="pf-cell-muted">{{ order.seller?.username ?? '—' }}</td>
+                        <td class="font-mono">S/ {{ orderTotal(order) | number: '1.2-2' }}</td>
+                        <td><span class="pf-badge" [class]="statusClass(order.status)">{{ statusLabel(order.status) }}</span></td>
+                        <td class="pf-cell-muted">{{ formatDate(order.orderDate) }}</td>
+                        <td>
+                          <button class="pf-btn-detail" type="button" (click)="toggleExpand(order.id)">
+                            {{ expandedOrderId() === order.id ? 'Ocultar' : 'Ver detalle' }}
+                          </button>
+                        </td>
+                      </tr>
+
+                      @if (expandedOrderId() === order.id) {
+                        <tr class="pf-detail-tr">
+                          <td colspan="7">
+                            <div class="pf-order-details">
+
+                              <app-order-tracker [status]="order.status" />
+
+                              @for (detail of order.orderDetails; track detail.id) {
+                                <div class="pf-detail-row">
+                                  <div class="pf-detail-thumb">
+                                    @if (detail.product.imageUrl) {
+                                      <img [src]="detail.product.imageUrl | imageUrl" [alt]="detail.product.name" />
+                                    } @else {
+                                      <span>{{ detail.product.name.charAt(0) }}</span>
+                                    }
+                                  </div>
+                                  <div class="pf-detail-info">
+                                    <p class="pf-detail-name">{{ detail.product.name }}</p>
+                                    @if (detail.color || detail.size) {
+                                      <p class="pf-detail-variant">{{ detail.color }}{{ detail.color && detail.size ? ' · ' : '' }}{{ detail.size ? 'Talla ' + detail.size : '' }}</p>
+                                    }
+                                    <p class="pf-detail-qty">
+                                      {{ detail.quantity }} × S/ {{ detail.unitPrice | number: '1.2-2' }}
+                                    </p>
+                                  </div>
+                                  <p class="pf-detail-subtotal font-mono">
+                                    S/ {{ detail.quantity * detail.unitPrice | number: '1.2-2' }}
+                                  </p>
+                                </div>
+                              }
+
+                              <app-order-shipping [address]="order.shippingAddress" />
+                              <app-order-payment [orderId]="order.id" mode="staff" />
+
+                              @if (order.discountAmount) {
+                                <p class="pf-detail-variant">Cupón {{ order.couponCode }}: − S/ {{ order.discountAmount | number: '1.2-2' }}</p>
+                              }
+                              @if (order.shippingCost != null) {
+                                <p class="pf-detail-variant">Envío: {{ order.shippingCost === 0 ? 'Gratis' : 'S/ ' + (order.shippingCost | number: '1.2-2') }}</p>
+                              }
+                              <div class="pf-order-total">
+                                <span>Total</span>
+                                <span class="font-mono">S/ {{ orderTotal(order) | number: '1.2-2' }}</span>
+                              </div>
+
+                              <a class="pf-btn-manage-inline" routerLink="/admin/orders">
+                                Gestionar este pedido en Admin → Pedidos
+                              </a>
+
+                            </div>
+                          </td>
+                        </tr>
+                      }
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="pf-pagination">
+                <span class="pf-pagination-info">
+                  Mostrando {{ pagedAdminOrders().length }} de {{ filteredAdminOrders().length }} pedidos
+                </span>
+                <div class="pf-pagination-controls">
+                  <button type="button" [disabled]="adminPage() === 0" (click)="goToAdminPage(adminPage() - 1)">‹</button>
+                  @for (p of pageNumbers(adminTotalPages()); track p) {
+                    <button type="button" [class.active]="adminPage() === p" (click)="goToAdminPage(p)">{{ p + 1 }}</button>
+                  }
+                  <button type="button" [disabled]="adminPage() >= adminTotalPages() - 1" (click)="goToAdminPage(adminPage() + 1)">›</button>
+                </div>
+              </div>
+            }
+
+            @if (adminStats(); as stats) {
+              @if (stats.outOfStock > 0 || stats.lowStock > 0) {
+                <div class="pf-admin-alerts">
+                  <h3 class="pf-admin-alerts-title font-mono">NECESITA TU ATENCIÓN</h3>
+                  @if (stats.outOfStock > 0) {
+                    <a class="pf-admin-alert" routerLink="/admin/products">
+                      <span class="pf-admin-alert-dot pf-admin-alert-danger"></span>
+                      {{ stats.outOfStock }} {{ stats.outOfStock === 1 ? 'producto sin stock' : 'productos sin stock' }}
+                    </a>
+                  }
+                  @if (stats.lowStock > 0) {
+                    <a class="pf-admin-alert" routerLink="/admin/products">
+                      <span class="pf-admin-alert-dot pf-admin-alert-warning"></span>
+                      {{ stats.lowStock }} {{ stats.lowStock === 1 ? 'producto con stock bajo' : 'productos con stock bajo' }}
+                    </a>
+                  }
+                </div>
+              }
+
+              <div class="pf-admin-shortcuts">
+                <a class="pf-admin-shortcut" routerLink="/admin/products">+ Nuevo producto</a>
+                <a class="pf-admin-shortcut" routerLink="/admin/collections">+ Nueva colección</a>
+                <a class="pf-admin-shortcut" routerLink="/admin/users">Gestionar usuarios</a>
+                <button class="pf-admin-shortcut" type="button" (click)="reports.downloadSales()">⬇ Ventas (CSV)</button>
+              </div>
+            }
+          </div>
+
+        }
+
+      </div>
+
+      <!-- Panel lateral -->
+      <aside class="pf-side-col">
+
+        <div class="pf-card pf-summary-card">
+          <h3>{{ activeSummaryTitle() }}</h3>
+          @for (row of activeSummaryRows(); track row.label) {
+            <div class="pf-summary-row">
+              <span class="pf-summary-label">{{ row.label }}</span>
+              <div class="pf-summary-value-wrap">
+                <span class="pf-summary-value font-mono">{{ row.value }}</span>
+                @if (row.trend) {
+                  <span class="pf-summary-trend" [class.pf-trend-neg]="!row.trend.positive">
+                    {{ row.trend.positive ? '↑' : '↓' }} {{ row.trend.label }}
+                  </span>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+        @if (viewMode.activeView() === 'ADMIN' && adminTopProducts().length > 0) {
+          <div class="pf-card pf-top-products-card">
+            <h3>Más vendidos del mes</h3>
+            @for (item of adminTopProducts(); track item.productId; let i = $index) {
+              <div class="pf-top-product-row">
+                <span class="pf-top-product-rank">{{ i + 1 }}</span>
+                <span class="pf-top-product-name">{{ item.productName }}</span>
+                <span class="pf-top-product-sold font-mono">{{ item.totalSold }}</span>
+              </div>
+            }
+          </div>
+        }
+
+        <div class="pf-card pf-recent-card">
+          <h3>Últimos pedidos</h3>
+          @if (activeRecent().length === 0) {
+            <p class="pf-empty-inline">Sin actividad todavía.</p>
+          } @else {
+            @for (order of activeRecent(); track order.id) {
+              <div class="pf-recent-item">
+                <div class="pf-recent-thumb">
+                  @if (primaryProduct(order); as product) {
+                    @if (product.imageUrl) {
+                      <img [src]="product.imageUrl | imageUrl" [alt]="product.name" />
+                    } @else {
+                      <span>#{{ order.id }}</span>
+                    }
+                  } @else {
+                    <span>#{{ order.id }}</span>
+                  }
+                </div>
+                <div class="pf-recent-info">
+                  <p class="pf-recent-id">Pedido #{{ order.id }}</p>
+                  <span class="pf-badge pf-badge-sm" [class]="statusClass(order.status)">{{ statusLabel(order.status) }}</span>
+                </div>
+                <div class="pf-recent-right">
+                  <p class="pf-recent-total font-mono">S/ {{ orderTotal(order) | number: '1.2-2' }}</p>
+                  <p class="pf-recent-time">{{ relativeTime(order.orderDate) }}</p>
+                </div>
+              </div>
+            }
+          }
+        </div>
+
+        @if (tipCard(); as tip) {
+          <div class="pf-card pf-tip-card">
+            <div class="pf-tip-icon">
+              @switch (tip.icon) {
+                @case ('rocket') {
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M12 2c3 2 5 6 5 10 0 2-1 4-2 5l-3 3-3-3c-1-1-2-3-2-5 0-4 2-8 5-10Z"/>
+                    <circle cx="12" cy="10" r="1.8"/>
+                    <path d="M8 16 5 19M16 16l3 3"/>
+                  </svg>
+                }
+                @case ('sparkle') {
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18"/>
+                  </svg>
+                }
+                @case ('shield') {
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M12 2 3 6v6c0 5 3.8 8.6 9 10 5.2-1.4 9-5 9-10V6z"/>
+                    <path d="M12 8v5M12 16h.01"/>
+                  </svg>
+                }
+              }
+            </div>
+            <p class="pf-tip-title">{{ tip.title }}</p>
+            <p class="pf-tip-text">{{ tip.text }}</p>
+            @if (tip.linkRoute) {
+              <a class="pf-tip-link" [routerLink]="tip.linkRoute">{{ tip.linkLabel }} →</a>
+            }
+          </div>
+        }
+
+      </aside>
+    </div>
+
+  }
+
+</section>

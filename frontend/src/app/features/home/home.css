@@ -1,0 +1,773 @@
+/* ============ HERO ============ */
+
+/* Las fotos (2058×764) ya traen grabado el título, el eyebrow y las
+   etiquetas — por eso el contenedor usa la MISMA proporción de la
+   foto (aspect-ratio) en vez de una altura fija: con una altura fija
+   que no coincide con la proporción real, object-fit:cover recortaba
+   por los costados y se comía el logo "ECM" grabado en el borde
+   izquierdo. Con la proporción exacta no hace falta recortar nada. */
+:host { display: block; overflow-x: clip; }
+
+/* Full-bleed: el hero ocupa todo el ancho de la ventana aunque el
+   contenedor padre tenga ancho máximo o márgenes. */
+.home-hero {
+  position: relative;
+  width: 100vw;
+  max-width: 100vw;
+  margin-left: calc(50% - 50vw);
+  aspect-ratio: 2058 / 764;
+  max-height: 720px;
+  min-height: 320px;
+  overflow: hidden;
+}
+
+/* Las 3 fotos quedan apiladas, una encima de otra, y se cruzan con un
+   fade — solo la de la diapositiva activa tiene opacity 1. */
+.home-hero-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.home-hero-bg.active {
+  opacity: 1;
+}
+
+/* Solo quedan los 2 botones reales — el resto del hero (título,
+   eyebrow, etiquetas) es parte de la foto. Posicionados en % (no px)
+   para que se mantengan alineados con el texto grabado sea cual sea
+   el ancho de pantalla, ya que la foto escala igual, en proporción. */
+.home-hero-actions {
+  position: absolute;
+  left: 6%;
+  top: 68%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 28px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s cubic-bezier(.2,.8,.2,1), opacity 0.2s ease, box-shadow 0.25s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px -10px rgba(0, 0, 0, 0.45);
+}
+
+.btn-primary {
+  background: #fff;
+  color: #111;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.home-hero-btn-secondary {
+  background: transparent;
+  border: 1px solid currentColor;
+}
+
+/* Oculto en desktop — solo se activa dentro del media query de
+   celular, de abajo. */
+.home-hero-mobile-text {
+  display: none;
+}
+
+.home-hero-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.home-hero-arrow:hover {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.home-hero-arrow-left {
+  left: 20px;
+}
+
+.home-hero-arrow-right {
+  right: 20px;
+}
+
+.home-hero-dots {
+  position: absolute;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(6px);
+}
+
+.home-hero-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  padding: 0;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.home-hero-dot.active {
+  background: #fff;
+  transform: scale(1.3);
+}
+
+/* ============ SECCIONES GENERALES ============ */
+
+.home-section {
+  padding: 56px var(--page-gutter);
+  max-width: var(--page-max);
+  margin: 0 auto;
+}
+
+.home-section-head {
+  margin-bottom: 28px;
+}
+
+.home-eyebrow {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.home-section-head h2 {
+  font-size: clamp(24px, 3.2vw, 34px);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.home-state-msg {
+  padding: 60px 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+/* ============ BIENVENIDA (solo invitados) ============ */
+
+.home-welcome-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding: 32px 40px;
+  border-radius: 20px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+}
+
+.home-welcome-text {
+  max-width: 480px;
+}
+
+.home-welcome-text h2 {
+  font-size: clamp(20px, 2.4vw, 26px);
+  font-weight: 700;
+  margin: 6px 0 8px;
+}
+
+.home-welcome-text p {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.home-welcome-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.home-welcome-btn-primary {
+  background: var(--text);
+  color: var(--bg);
+}
+
+.home-welcome-btn-outline {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+/* ============ CATEGORÍAS ============ */
+
+.home-cat-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(210px, 1fr);
+  gap: 18px;
+  overflow-x: auto;
+  padding-bottom: 14px;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--accent) 50%, transparent) transparent;
+}
+
+.home-cat-grid > .home-cat-tile { scroll-snap-align: start; }
+
+.home-cat-tile {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  height: 200px;
+  border-radius: 18px;
+  overflow: hidden;
+  text-decoration: none;
+  background: linear-gradient(155deg, color-mix(in srgb, var(--accent) 14%, var(--bg-elevated)), var(--bg));
+  border: 1px solid var(--border);
+  transition: transform 0.25s ease;
+}
+
+.home-cat-tile:hover {
+  transform: translateY(-4px);
+}
+
+.home-cat-tile img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.home-cat-ph {
+  position: absolute;
+  inset: 0;
+}
+
+.home-cat-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.55) 100%);
+}
+
+.home-cat-label {
+  position: relative;
+  padding: 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.home-cat-tile-promo {
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 6px;
+  text-align: center;
+  background: #171717;
+  border-color: #171717;
+}
+
+.home-cat-tile-promo .home-cat-label {
+  padding: 0;
+  color: #fff;
+}
+
+.home-cat-promo-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: color-mix(in srgb, var(--accent) 65%, #fff);
+}
+
+/* ============ GRID DE PRODUCTOS ============ */
+
+.home-product-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+/* ============ BANNER PROMO ============ */
+
+/* Misma idea que el hero: la foto (1032×112) ya trae grabado el
+   eyebrow, el titular y el subtítulo — el contenedor usa esa misma
+   proporción para no recortarla, y solo el botón es HTML real. */
+.home-promo-banner {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1032 / 112;
+  min-height: 90px;
+  overflow: hidden;
+}
+
+.home-promo-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.home-promo-btn {
+  position: absolute;
+  right: 5%;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  color: #111;
+  white-space: nowrap;
+}
+
+.home-promo-mobile-text {
+  display: none;
+}
+
+/* ============ RESPONSIVE ============ */
+
+@media (max-width: 1080px) {
+  .home-section { padding: 48px 40px; }
+  .home-product-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 780px) {
+  /* Pantalla angosta: las fotos son demasiado panorámicas — recortarlas
+     para que quepan en vertical se comía el texto grabado (lo viste en
+     la captura). Acá se ocultan las fotos y se usa un fondo liso +
+     texto real en su lugar, en flujo normal (ya no hace falta alinear
+     nada con coordenadas de una foto que no está). En desktop nada de
+     esto aplica — sigue igual que antes. */
+  .home-hero {
+    aspect-ratio: unset;
+    max-height: none;
+    min-height: unset;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 96px 24px 44px;
+    background:
+      radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--accent) 35%, transparent), transparent 60%),
+      linear-gradient(155deg, #2a2a2a, #111111);
+  }
+
+  .home-hero-bg { display: none; }
+
+  .home-hero-mobile-text {
+    display: block;
+    position: relative;
+    color: #fff;
+    margin-bottom: 22px;
+  }
+
+  .home-hero-mobile-text .home-hero-eyebrow {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    opacity: 0.85;
+    margin-bottom: 14px;
+  }
+
+  .home-hero-mobile-text h1 {
+    font-size: clamp(28px, 8.5vw, 38px);
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .home-hero-mobile-text .home-hero-title-light {
+    font-weight: 400;
+    opacity: 0.75;
+  }
+
+  .home-hero-mobile-text .home-hero-title-bold {
+    font-weight: 700;
+  }
+
+  .home-hero-mobile-text .home-hero-subtitle {
+    font-size: 14px;
+    line-height: 1.6;
+    opacity: 0.85;
+  }
+
+  .home-hero-actions {
+    position: static;
+    transform: none;
+  }
+
+  /* El botón "Iniciar sesión" de las diapositivas 1 y 3 usa un color
+     oscuro (pensado para foto clara) — sobre el fondo oscuro de acá
+     quedaría invisible, así que se fuerza blanco solo en este ancho. */
+  .home-hero-btn-secondary {
+    border-color: #fff !important;
+    color: #fff !important;
+  }
+
+  .home-section { padding: 40px 24px; }
+  .home-product-grid { grid-template-columns: repeat(2, 1fr); }
+  .home-hero-arrow { display: none; }
+  .home-welcome-card { padding: 24px; }
+
+  /* Mismo criterio en el banner de envío. */
+  .home-promo-banner {
+    aspect-ratio: unset;
+    min-height: unset;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 18px;
+    padding: 28px 24px;
+    background: #171717;
+  }
+
+  .home-promo-bg { display: none; }
+
+  .home-promo-mobile-text {
+    display: block;
+    color: #fff;
+  }
+
+  .home-promo-eyebrow {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    opacity: 0.85;
+    margin-bottom: 10px;
+  }
+
+  .home-promo-mobile-text h2 {
+    font-size: 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+    line-height: 1.2;
+    margin-bottom: 6px;
+  }
+
+  .home-promo-mobile-text p {
+    font-size: 13px;
+    opacity: 0.75;
+  }
+
+  .home-promo-btn {
+    position: static;
+    transform: none;
+    align-self: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-product-grid { grid-template-columns: 1fr; }
+}
+
+
+/* =====================================================================
+   ANIMACIONES
+   - Todo con CSS puro. Las de "aparecer al hacer scroll" usan
+     animation-timeline: view() (Chrome/Edge/Safari 26+); en navegadores
+     que no lo soportan caen a una entrada simple al cargar.
+   - Se animan `translate`/`scale` (propiedades individuales) para no
+     pelear con los `transform` de los hovers.
+   - prefers-reduced-motion ya se respeta globalmente en styles.css.
+   ===================================================================== */
+
+@keyframes ecmFadeUp {
+  from { opacity: 0; translate: 0 28px; }
+  to   { opacity: 1; translate: 0 0; }
+}
+@keyframes ecmFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes ecmKenBurns {
+  from { scale: 1; }
+  to   { scale: 1.07; }
+}
+@keyframes ecmMarquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@keyframes ecmLine {
+  from { scale: 0 1; }
+  to   { scale: 1 1; }
+}
+@keyframes ecmSheen {
+  from { translate: -140% 0; }
+  to   { translate: 240% 0; }
+}
+@keyframes ecmSoftPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.45); }
+  60%      { box-shadow: 0 0 0 12px rgba(255, 255, 255, 0); }
+}
+@keyframes ecmProgress {
+  from { scale: 0 1; }
+  to   { scale: 1 1; }
+}
+
+/* ---------- Hero ---------- */
+
+/* Zoom lento (Ken Burns) solo en la diapositiva activa: al cambiar de
+   foto la animación se reinicia sola. */
+.home-hero-bg.active {
+  animation: ecmKenBurns 9s ease-out both;
+  transform-origin: 62% 50%;
+}
+
+/* Entrada progresiva de los botones y del texto móvil. */
+.home-hero-actions > * {
+  opacity: 0;
+  animation: ecmFadeUp 0.7s cubic-bezier(.2,.8,.2,1) both;
+}
+.home-hero-actions > *:nth-child(1) { animation-delay: 0.35s; }
+.home-hero-actions > *:nth-child(2) { animation-delay: 0.5s; }
+
+.home-hero-mobile-text > * {
+  opacity: 0;
+  animation: ecmFadeUp 0.7s cubic-bezier(.2,.8,.2,1) both;
+}
+.home-hero-mobile-text > *:nth-child(1) { animation-delay: 0.1s; }
+.home-hero-mobile-text > *:nth-child(2) { animation-delay: 0.25s; }
+.home-hero-mobile-text > *:nth-child(3) { animation-delay: 0.4s; }
+
+/* Brillo que cruza el botón principal cada tanto. */
+.home-hero-btn-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 40%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  translate: -140% 0;
+  skew: -18deg;
+  animation: ecmSheen 3.6s ease-in-out 1.6s infinite;
+  pointer-events: none;
+}
+
+/* Flechas y puntos del carrusel. */
+.home-hero-arrow {
+  transition: transform 0.2s ease, background-color 0.2s ease, opacity 0.2s ease;
+}
+.home-hero-arrow-left:hover  { transform: translateY(-50%) translateX(-3px); }
+.home-hero-arrow-right:hover { transform: translateY(-50%) translateX(3px); }
+.home-hero-dot { transition: background-color 0.25s ease, transform 0.25s ease, width 0.3s ease; }
+.home-hero-dot:hover { transform: scale(1.35); }
+
+/* ---------- Marquee infinito ---------- */
+
+.home-marquee {
+  overflow: hidden;
+  border-block: 1px solid var(--border);
+  background: var(--bg-elevated);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.home-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: ecmMarquee 34s linear infinite;
+}
+.home-marquee:hover .home-marquee-track { animation-play-state: paused; }
+.home-marquee-group {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.home-marquee-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 28px;
+  padding: 14px 28px 14px 0;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--text-muted);
+}
+.home-marquee-item::after {
+  content: '✦';
+  color: var(--accent);
+  font-size: 10px;
+}
+
+/* ---------- Encabezados de sección ---------- */
+
+.home-eyebrow { position: relative; padding-left: 0; }
+.home-section-head .home-eyebrow::after {
+  content: '';
+  display: block;
+  width: 36px;
+  height: 2px;
+  margin-top: 6px;
+  background: var(--accent);
+  transform-origin: left;
+}
+
+/* ---------- Tarjeta de bienvenida ---------- */
+
+.home-welcome-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.home-welcome-card:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  box-shadow: 0 18px 36px -22px rgba(0, 0, 0, 0.4);
+}
+
+/* ---------- Categorías: hover elegante ---------- */
+
+.home-cat-tile {
+  transition: transform 0.35s cubic-bezier(.2,.8,.2,1), box-shadow 0.35s ease, border-color 0.35s ease;
+}
+.home-cat-tile img {
+  transition: scale 0.7s cubic-bezier(.2,.8,.2,1);
+}
+.home-cat-overlay {
+  transition: opacity 0.35s ease, background 0.35s ease;
+}
+.home-cat-label {
+  transition: translate 0.35s cubic-bezier(.2,.8,.2,1);
+}
+.home-cat-label::after {
+  content: '→';
+  display: inline-block;
+  margin-left: 8px;
+  opacity: 0;
+  translate: -8px 0;
+  transition: opacity 0.3s ease, translate 0.3s ease;
+}
+.home-cat-tile:hover,
+.home-cat-tile:focus-visible {
+  transform: translateY(-6px);
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+  box-shadow: 0 22px 36px -22px rgba(0, 0, 0, 0.55);
+}
+.home-cat-tile:hover img,
+.home-cat-tile:focus-visible img { scale: 1.09; }
+.home-cat-tile:hover .home-cat-overlay {
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.05) 20%, rgba(0, 0, 0, 0.7) 100%);
+}
+.home-cat-tile:hover .home-cat-label { translate: 0 -4px; }
+.home-cat-tile:hover .home-cat-label::after,
+.home-cat-tile:focus-visible .home-cat-label::after { opacity: 1; translate: 0 0; }
+.home-cat-tile-promo:hover { background: color-mix(in srgb, var(--accent) 22%, #171717); }
+
+/* ---------- Productos ---------- */
+
+app-home-product-card { display: block; }
+
+/* ---------- Banner promo ---------- */
+
+.home-promo-bg { transition: scale 1.2s cubic-bezier(.2,.8,.2,1); }
+.home-promo-banner:hover .home-promo-bg { scale: 1.03; }
+.home-promo-btn { animation: ecmSoftPulse 2.8s ease-out 1s infinite; }
+.home-promo-btn:hover { animation-play-state: paused; }
+
+/* ---------- Microinteracciones de botones ---------- */
+
+.btn svg { transition: translate 0.25s cubic-bezier(.2,.8,.2,1); }
+.btn:hover svg { translate: 4px 0; }
+.btn:active { transform: translateY(0) scale(0.97); box-shadow: none; }
+.btn:focus-visible,
+.home-cat-tile:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* ---------- Barra de progreso de scroll (solo con soporte) ---------- */
+
+.home-progress { display: none; }
+
+/* ---------- Aparecer al hacer scroll ---------- */
+
+/* Fallback (sin animation-timeline): entrada escalonada al cargar. */
+.home-section-head,
+.home-welcome-card,
+.home-cat-grid,
+.home-product-grid > * {
+  animation: ecmFadeUp 0.7s cubic-bezier(.2,.8,.2,1) both;
+}
+.home-product-grid > *:nth-child(4n + 2) { animation-delay: 0.08s; }
+.home-product-grid > *:nth-child(4n + 3) { animation-delay: 0.16s; }
+.home-product-grid > *:nth-child(4n + 4) { animation-delay: 0.24s; }
+
+@supports (animation-timeline: view()) {
+
+  /* Cada bloque se revela cuando entra en pantalla. */
+  .home-section-head,
+  .home-welcome-card,
+  .home-cat-grid,
+  .home-product-grid > *,
+  .home-promo-banner {
+    animation: ecmFadeUp linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 45%;
+    animation-delay: 0s;
+  }
+
+  /* Escalonado de las columnas dentro de cada fila. */
+  .home-product-grid > *:nth-child(4n + 2) { animation-range: entry 6% entry 51%; }
+  .home-product-grid > *:nth-child(4n + 3) { animation-range: entry 12% entry 57%; }
+  .home-product-grid > *:nth-child(4n + 4) { animation-range: entry 18% entry 63%; }
+
+  /* La línea decorativa del título "crece" al entrar. */
+  .home-section-head .home-eyebrow::after {
+    animation: ecmLine linear both;
+    animation-timeline: view();
+    animation-range: entry 10% entry 60%;
+  }
+
+  /* Banner promo: solo fade (no desplaza la foto panorámica). */
+  .home-promo-banner { animation-name: ecmFadeIn; }
+
+  .home-progress {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    z-index: 2000;
+    background: var(--accent);
+    transform-origin: left;
+    animation: ecmProgress linear both;
+    animation-timeline: scroll(root);
+    pointer-events: none;
+  }
+}

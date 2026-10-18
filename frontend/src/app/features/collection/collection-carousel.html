@@ -1,0 +1,50 @@
+<section class="cc-section">
+
+  <div class="cc-heading">
+    <h2 class="font-display">{{ title() }}</h2>
+    @if (slogan()) {
+      <p class="cc-slogan">{{ slogan() }}</p>
+    }
+  </div>
+
+  <div class="cc-carousel">
+    <button class="cc-arrow cc-arrow-left" type="button" (click)="scroll(-1)" aria-label="Anterior">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="m15 18-6-6 6-6"/>
+      </svg>
+    </button>
+
+    <div class="cc-track" #track>
+      @for (product of products(); track product.id) {
+        <a class="cc-card" [routerLink]="['/products', product.id]">
+          <div class="cc-card-media">
+            @if (product.imageUrl) {
+              <img [src]="product.imageUrl | imageUrl" [alt]="product.name" />
+            } @else {
+              <span class="cc-ph">{{ product.name }}</span>
+            }
+
+            @if (product.discountPercentage) {
+              <span class="cc-discount-tag">-{{ product.discountPercentage }}%</span>
+            }
+          </div>
+
+          <p class="cc-card-name">{{ product.name }}</p>
+          <p class="cc-card-price-row">
+            @if (product.discountPercentage) {
+              <span class="cc-card-price-original font-mono">S/ {{ product.price | number: '1.2-2' }}</span>
+            }
+            <span class="cc-card-price font-mono">S/ {{ effectivePrice(product) | number: '1.2-2' }}</span>
+          </p>
+        </a>
+      }
+    </div>
+
+    <button class="cc-arrow cc-arrow-right" type="button" (click)="scroll(1)" aria-label="Siguiente">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="m9 18 6-6-6-6"/>
+      </svg>
+    </button>
+  </div>
+
+</section>

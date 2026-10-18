@@ -1,0 +1,178 @@
+<section class="ao-page">
+
+  <header class="ao-header">
+    <div>
+      <h1 class="font-display">Pedidos</h1>
+      <p class="ao-subtitle">Todos los pedidos del sistema.</p>
+    </div>
+  </header>
+
+  <div class="ao-stats">
+    <div class="ao-stat-card">
+      <span class="ao-stat-label font-mono">TOTAL</span>
+      <span class="ao-stat-value">{{ stats().total }}</span>
+    </div>
+    <div class="ao-stat-card ao-stat-pending">
+      <span class="ao-stat-label font-mono">PENDIENTES</span>
+      <span class="ao-stat-value">{{ stats().pending }}</span>
+    </div>
+    <div class="ao-stat-card ao-stat-confirmed">
+      <span class="ao-stat-label font-mono">CONFIRMADOS</span>
+      <span class="ao-stat-value">{{ stats().confirmed }}</span>
+    </div>
+    <div class="ao-stat-card ao-stat-shipped">
+      <span class="ao-stat-label font-mono">EN CAMINO</span>
+      <span class="ao-stat-value">{{ stats().shipped }}</span>
+    </div>
+    <div class="ao-stat-card ao-stat-delivered">
+      <span class="ao-stat-label font-mono">ENTREGADOS</span>
+      <span class="ao-stat-value">{{ stats().delivered }}</span>
+    </div>
+    <div class="ao-stat-card ao-stat-cancelled">
+      <span class="ao-stat-label font-mono">CANCELADOS</span>
+      <span class="ao-stat-value">{{ stats().cancelled }}</span>
+    </div>
+  </div>
+
+  <div class="ao-toolbar">
+    <div class="ao-search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/>
+        <path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input
+        #searchInput
+        type="text"
+        placeholder="Buscar por # de pedido, cliente o vendedor..."
+        (input)="onSearchInput(searchInput.value)"
+      />
+    </div>
+
+    <select #statusSelect class="ao-select" (change)="onStatusFilterChange(statusSelect.value)">
+      <option value="all">Todos los estados</option>
+      @for (s of allStatuses; track s) {
+        <option [value]="s">{{ statusLabel(s) }}</option>
+      }
+    </select>
+  </div>
+
+  @if (actionError()) {
+    <div class="ao-action-error">{{ actionError() }}</div>
+  }
+
+  @if (loading()) {
+    <p class="ao-state-msg">Cargando pedidos...</p>
+  } @else if (loadError()) {
+    <p class="ao-state-msg ao-state-error">
+      No se pudo cargar el listado.
+      <button class="ao-link-btn" type="button" (click)="loadOrders()">Reintentar</button>
+    </p>
+  } @else if (filteredOrders().length === 0) {
+    <p class="ao-state-msg">No hay pedidos que coincidan con el filtro.</p>
+  } @else {
+
+    <div class="ao-table-wrap">
+      <table class="ao-table">
+        <thead>
+        <tr>
+          <th>Pedido</th>
+          <th>Cliente</th>
+          <th>Vendedor</th>
+          <th>Total</th>
+          <th>Estado</th>
+          <th class="ao-col-actions">Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+          @for (order of filteredOrders(); track trackById($index, order)) {
+            <tr>
+              <td>
+                <button class="ao-order-toggle" type="button" (click)="toggleExpand(order.id)">
+                  <svg
+                    class="ao-chevron"
+                    [class.ao-chevron-open]="expandedOrderId() === order.id"
+                    width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  >
+                    <path d="m9 18 6-6-6-6"/>
+                  </svg>
+                  <span>
+                    <p class="ao-order-id">#{{ order.id }}</p>
+                    <p class="ao-order-date">{{ formatDate(order.orderDate) }} · {{ orderItemCount(order) }} art.</p>
+                  </span>
+                </button>
+              </td>
+              <td>{{ order.user.username }}</td>
+              <td>
+                @if (order.seller) {
+                  {{ order.seller.username }}
+                } @else {
+                  <span class="ao-unassigned">Sin asignar</span>
+                }
+              </td>
+              <td class="font-mono">S/ {{ orderTotal(order) | number: '1.2-2' }}</td>
+              <td>
+                <select
+                  class="ao-status-select"
+                  [class]="statusClass(order.status)"
+                  [value]="order.status"
+                  [disabled]="isTerminal(order.status) || updatingStatusId() === order.id"
+                  (change)="changeStatus(order, $any($event.target).value)"
+                >
+                  @for (s of allStatuses; track s) {
+                    <option [value]="s">{{ statusLabel(s) }}</option>
+                  }
+                </select>
+              </td>
+              <td class="ao-col-actions">
+                @if (confirmingDeleteId() === order.id) {
+                  <div class="ao-confirm-delete">
+                    <span>¿Eliminar?</span>
+                    <button
+                      class="ao-icon-btn ao-icon-btn-danger"
+                      type="button"
+                      [disabled]="deletingId() === order.id"
+                      (click)="confirmDelete(order.id)"
+                    >
+                      Sí
+                    </button>
+                    <button class="ao-icon-btn" type="button" (click)="cancelDelete()">No</button>
+                  </div>
+                } @else {
+                  <button class="ao-icon-btn ao-icon-btn-danger" type="button" aria-label="Eliminar" (click)="askDelete(order.id)">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/>
+                    </svg>
+                  </button>
+                }
+              </td>
+            </tr>
+
+            @if (expandedOrderId() === order.id) {
+              <tr class="ao-detail-row">
+                <td colspan="6">
+                  @for (detail of order.orderDetails; track detail.id) {
+                    <div class="ao-detail-item">
+                      <span class="ao-detail-name">
+                        {{ detail.product.name }}
+                        @if (detail.color || detail.size) {
+                          <span class="ao-detail-variant">{{ detail.color }}{{ detail.color && detail.size ? ' · ' : '' }}{{ detail.size ? 'Talla ' + detail.size : '' }}</span>
+                        }
+                      </span>
+                      <span class="ao-detail-qty">{{ detail.quantity }} × S/ {{ detail.unitPrice | number: '1.2-2' }}</span>
+                      <span class="ao-detail-subtotal font-mono">
+                        S/ {{ detail.quantity * detail.unitPrice | number: '1.2-2' }}
+                      </span>
+                    </div>
+                  }
+                  <app-order-shipping [address]="order.shippingAddress" />
+                  <app-order-payment [orderId]="order.id" mode="staff" />
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+</section>

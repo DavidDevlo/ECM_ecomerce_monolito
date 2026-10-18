@@ -1,0 +1,41 @@
+<div class="tb-wrap">
+  @for (item of items; track item.label) {
+    <div class="tb-item">
+
+      @switch (item.icon) {
+        @case ('truck') {
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <rect x="1" y="6" width="14" height="11" rx="1.5"/>
+            <path d="M15 10h4l3 3.5V17h-7z"/>
+            <circle cx="6" cy="19.5" r="1.7"/>
+            <circle cx="17.5" cy="19.5" r="1.7"/>
+          </svg>
+        }
+        @case ('return') {
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M3 12a9 9 0 1 0 2.6-6.36"/>
+            <path d="M3 4v5h5"/>
+          </svg>
+        }
+        @case ('lock') {
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <rect x="4" y="10.5" width="16" height="10" rx="2"/>
+            <path d="M7.5 10.5V7a4.5 4.5 0 0 1 9 0v3.5"/>
+          </svg>
+        }
+        @default {
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M12 2 3 6v6c0 5 3.8 8.6 9 10 5.2-1.4 9-5 9-10V6z"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+        }
+      }
+
+      <div class="tb-text">
+        <span class="tb-label">{{ item.label }}</span>
+        <span class="tb-detail">{{ item.detail }}</span>
+      </div>
+
+    </div>
+  }
+</div>

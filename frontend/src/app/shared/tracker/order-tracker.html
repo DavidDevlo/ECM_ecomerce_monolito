@@ -1,0 +1,51 @@
+@if (status() === OrderStatus.CANCELLED) {
+  <div class="ot-cancelled">
+    <span class="ot-cancelled-dot"></span>
+    Este pedido fue cancelado.
+  </div>
+} @else {
+  <div class="ot-tracker">
+    @for (step of steps(); track step.status; let last = $last) {
+      <div class="ot-step" [class.ot-step-reached]="step.reached" [class.ot-step-current]="step.current">
+        <div class="ot-icon-col">
+          <div class="ot-icon">
+            @switch (step.status) {
+              @case (OrderStatus.PENDING) {
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="5" y="4" width="14" height="18" rx="2"/>
+                  <path d="M9 2h6a1 1 0 0 1 1 1v2H8V3a1 1 0 0 1 1-1Z"/>
+                  <path d="M9 12h6M9 16h4"/>
+                </svg>
+              }
+              @case (OrderStatus.CONFIRMED) {
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 6 9 17l-5-5"/>
+                </svg>
+              }
+              @case (OrderStatus.SHIPPED) {
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 3h13v13H1z"/>
+                  <path d="M14 8h4l3 3v5h-7V8Z"/>
+                  <circle cx="5.5" cy="18.5" r="1.5"/>
+                  <circle cx="17.5" cy="18.5" r="1.5"/>
+                </svg>
+              }
+              @case (OrderStatus.DELIVERED) {
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+              }
+            }
+          </div>
+
+          @if (!last) {
+            <div class="ot-line" [class.ot-line-active]="step.lineActive"></div>
+          }
+        </div>
+
+        <span class="ot-label">{{ step.label }}</span>
+      </div>
+    }
+  </div>
+}

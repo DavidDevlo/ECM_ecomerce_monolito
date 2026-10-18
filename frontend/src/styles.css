@@ -1,0 +1,68 @@
+/* =========================================================
+   ECM · Design tokens
+   Copia el contenido de este archivo dentro de tu app.css
+   global (o impórtalo con @import './styles/theme-tokens.css';
+   al inicio de app.css). Define la paleta clara/oscura y la
+   tipografía usadas por header, home y placeholder.
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Sora:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap');
+
+:root,
+[data-theme='dark'] {
+  /* Margen lateral y ancho máximo globales de las páginas */
+  --page-gutter: clamp(25px, 3vw, 40px);
+  --page-max: 1640px;
+  --bg: #0e1116;
+  --bg-elevated: #171b22;
+  --text: #f3f1ea;
+  --text-muted: #9aa0ac;
+  --accent: #8fa888;
+  --accent-strong: #b8cda9;
+  --border: #262b33;
+  --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme='light'] {
+  --bg: #f7f5f0;
+  --bg-elevated: #ffffff;
+  --text: #14171c;
+  --text-muted: #5b616b;
+  --accent: #4f6b49;
+  --accent-strong: #3a4f36;
+  --border: #e4e0d6;
+  --shadow: 0 20px 40px rgba(20, 23, 28, 0.08);
+}
+
+html {
+  color-scheme: light dark;
+}
+
+html,
+body {
+  margin: 0;
+}
+
+body {
+  overflow-x: clip; /* evita scroll lateral con elementos de 100vw (hero) */
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Sora', system-ui, sans-serif;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+.font-display {
+  font-family: 'Big Shoulders Display', sans-serif;
+}
+
+.font-mono {
+  font-family: 'Space Mono', monospace;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

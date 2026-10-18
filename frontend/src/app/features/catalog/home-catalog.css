@@ -1,0 +1,49 @@
+.hc-page {
+  padding: 48px var(--page-gutter) 80px;
+  max-width: var(--page-max);
+  margin: 0 auto;
+}
+
+.hc-header {
+  margin-bottom: 36px;
+}
+
+.hc-eyebrow {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.hc-header h2 {
+  font-size: clamp(26px, 3.6vw, 38px);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.hc-state-msg {
+  padding: 60px 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.hc-state-error {
+  color: #dc6a5c;
+}
+
+.hc-link-btn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 6px;
+}
+
+@media (max-width: 780px) {
+  .hc-page {
+    padding: 36px 24px 60px;
+  }
+}

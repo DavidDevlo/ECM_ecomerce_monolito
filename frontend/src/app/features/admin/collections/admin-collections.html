@@ -1,0 +1,190 @@
+<section class="acol-page">
+
+  <header class="acol-header">
+    <div>
+      <h1 class="font-display">Colecciones</h1>
+      <p class="acol-subtitle">Resalta productos en el catálogo con un mensaje propio.</p>
+    </div>
+
+    <button class="acol-btn-primary" type="button" (click)="openCreateModal()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 5v14M5 12h14"/>
+      </svg>
+      Nueva colección
+    </button>
+  </header>
+
+  <div class="acol-search">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"/>
+      <path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input
+      #searchInput
+      type="text"
+      placeholder="Buscar colección..."
+      (input)="onSearchInput(searchInput.value)"
+    />
+  </div>
+
+  @if (loading()) {
+    <p class="acol-state-msg">Cargando colecciones...</p>
+  } @else if (loadError()) {
+    <p class="acol-state-msg acol-state-error">
+      No se pudo cargar el listado.
+      <button class="acol-link-btn" type="button" (click)="loadAll()">Reintentar</button>
+    </p>
+  } @else if (filteredCollections().length === 0) {
+    <p class="acol-state-msg">No hay colecciones que coincidan con el filtro.</p>
+  } @else {
+
+    <div class="acol-table-wrap">
+      <table class="acol-table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Slogan</th>
+            <th>Productos</th>
+            <th>Estado</th>
+            <th class="acol-col-actions">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (collection of filteredCollections(); track trackById($index, collection)) {
+            <tr>
+              <td class="acol-name">{{ collection.name }}</td>
+              <td class="acol-slogan">{{ collection.slogan }}</td>
+              <td class="font-mono">{{ collection.products.length }}</td>
+              <td>
+                <span class="acol-badge" [class.acol-badge-active]="collection.active" [class.acol-badge-inactive]="!collection.active">
+                  {{ collection.active ? 'Activa' : 'Inactiva' }}
+                </span>
+              </td>
+              <td class="acol-col-actions">
+                @if (confirmingDeleteId() === collection.id) {
+                  <div class="acol-confirm-delete">
+                    <span>¿Eliminar?</span>
+                    <button
+                      class="acol-icon-btn acol-icon-btn-danger"
+                      type="button"
+                      [disabled]="deletingId() === collection.id"
+                      (click)="confirmDelete(collection.id)"
+                    >
+                      Sí
+                    </button>
+                    <button class="acol-icon-btn" type="button" (click)="cancelDelete()">No</button>
+                  </div>
+                } @else {
+                  <div class="acol-row-actions">
+                    <button class="acol-icon-btn" type="button" aria-label="Editar" (click)="openEditModal(collection)">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                        <path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"/>
+                      </svg>
+                    </button>
+                    <button class="acol-icon-btn acol-icon-btn-danger" type="button" aria-label="Eliminar" (click)="askDelete(collection.id)">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/>
+                      </svg>
+                    </button>
+                  </div>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+</section>
+
+@if (isModalOpen()) {
+  <div class="acol-modal-backdrop" (click)="closeModal()">
+    <div class="acol-modal" (click)="$event.stopPropagation()">
+
+      <div class="acol-modal-header">
+        <h2 class="font-display">{{ editingCollection() ? 'Editar colección' : 'Nueva colección' }}</h2>
+        <button class="acol-icon-btn" type="button" aria-label="Cerrar" (click)="closeModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6 6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      @if (formError()) {
+        <div class="acol-form-error">{{ formError() }}</div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="submitForm()">
+
+        <div class="acol-form-row">
+          <label for="col-name">Nombre</label>
+          <input id="col-name" type="text" formControlName="name" placeholder="Recién llegado" />
+          @if (form.controls.name.invalid && form.controls.name.touched) {
+            <p class="acol-hint">El nombre es obligatorio.</p>
+          }
+        </div>
+
+        <div class="acol-form-row">
+          <label for="col-slogan">Slogan / mensaje</label>
+          <input id="col-slogan" type="text" formControlName="slogan" placeholder="Lo nuevo de la temporada" />
+          @if (form.controls.slogan.invalid && form.controls.slogan.touched) {
+            <p class="acol-hint">El slogan es obligatorio.</p>
+          }
+        </div>
+
+        <label class="acol-toggle">
+          <input type="checkbox" formControlName="active" />
+          <span>Colección activa (visible en el catálogo)</span>
+        </label>
+
+        <div class="acol-picker">
+          <div class="acol-picker-header">
+            <label>Productos ({{ selectedProductIds().size }} seleccionados)</label>
+            <input
+              #pickerSearch
+              type="text"
+              class="acol-picker-search"
+              placeholder="Buscar producto..."
+              (input)="onPickerSearchInput(pickerSearch.value)"
+            />
+          </div>
+
+          <div class="acol-picker-list">
+            @if (filteredPickerProducts().length === 0) {
+              <p class="acol-picker-empty">No hay productos para mostrar.</p>
+            }
+            @for (product of filteredPickerProducts(); track product.id) {
+              <label class="acol-picker-item">
+                <input
+                  type="checkbox"
+                  [checked]="isSelected(product.id)"
+                  (change)="toggleProduct(product.id)"
+                />
+                <span class="acol-picker-thumb">
+                  @if (product.imageUrl) {
+                    <img [src]="product.imageUrl | imageUrl" [alt]="product.name" />
+                  } @else {
+                    <span>{{ product.name.charAt(0) }}</span>
+                  }
+                </span>
+                <span class="acol-picker-name">{{ product.name }}</span>
+                <span class="acol-picker-price font-mono">S/ {{ product.price | number: '1.2-2' }}</span>
+              </label>
+            }
+          </div>
+        </div>
+
+        <div class="acol-modal-actions">
+          <button class="acol-btn-ghost" type="button" (click)="closeModal()">Cancelar</button>
+          <button class="acol-btn-primary" type="submit" [disabled]="saving()">
+            {{ saving() ? 'Guardando...' : (editingCollection() ? 'Guardar cambios' : 'Crear colección') }}
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+}

@@ -1,0 +1,19 @@
+.ip-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 60px 24px 90px;
+}
+
+.ip-page h1 {
+  font-size: clamp(26px, 3.6vw, 36px);
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 28px;
+}
+
+.ip-paragraph {
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--text-muted);
+  margin-bottom: 18px;
+}

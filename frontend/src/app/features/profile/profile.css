@@ -1,0 +1,1025 @@
+.pf-page {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 40px 24px 90px;
+}
+
+/* Encabezado */
+.pf-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+
+.pf-identity {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.pf-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Big Shoulders Display', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.pf-greeting {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.pf-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.pf-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pf-date-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.pf-btn-logout {
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.pf-btn-logout:hover {
+  border-color: #dc6a5c;
+  color: #dc6a5c;
+}
+
+/* KPI tiles — auto-fit en vez de un conteo fijo de columnas: Admin
+   puede tener 5 tiles (cuando cargó el resumen de ingresos) sin que
+   el layout se rompa, y Cliente/Vendedor con 4 se ven igual que antes. */
+.pf-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.pf-kpi-tile {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px 18px;
+  border-radius: 18px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+}
+
+.pf-kpi-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.kpi-blue {
+  background: color-mix(in srgb, #5b8fd9 18%, transparent);
+  color: #5b8fd9;
+}
+
+.kpi-amber {
+  background: color-mix(in srgb, #d9a441 18%, transparent);
+  color: #d9a441;
+}
+
+.kpi-sky {
+  background: color-mix(in srgb, #6bb7c9 18%, transparent);
+  color: #6bb7c9;
+}
+
+.kpi-green {
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+  color: var(--accent-strong);
+}
+
+.pf-kpi-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.pf-kpi-value {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.pf-kpi-label {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pf-kpi-caption-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.pf-kpi-trend {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-strong);
+}
+
+/* Selectores compuestos a propósito (en vez de un ".pf-trend-neg"
+   suelto): así el color negativo gana siempre sin importar el orden
+   de aparición de ".pf-kpi-trend"/".pf-summary-trend" en la cascada. */
+.pf-kpi-trend.pf-trend-neg,
+.pf-summary-trend.pf-trend-neg {
+  color: #dc6a5c;
+}
+
+.pf-kpi-caption {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Grilla principal */
+.pf-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.pf-main-col {
+  min-width: 0;
+}
+
+.pf-side-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: sticky;
+  top: 88px;
+}
+
+.pf-card {
+  border-radius: 20px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  padding: 22px 22px 20px;
+}
+
+.pf-card h3 {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+/* Tarjeta de tabla */
+.pf-table-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.pf-table-card-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.pf-table-subtitle {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.pf-table-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pf-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-muted);
+  min-width: 200px;
+}
+
+.pf-search input {
+  flex: 1;
+  border: none;
+  background: none;
+  color: var(--text);
+  font-size: 13px;
+  padding: 9px 0;
+}
+
+.pf-search input:focus {
+  outline: none;
+}
+
+.pf-status-select {
+  padding: 9px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pf-btn-manage {
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: none;
+  background: var(--accent);
+  color: var(--bg);
+  font-size: 12.5px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.pf-btn-manage-inline {
+  display: inline-block;
+  margin-top: 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.pf-btn-manage-inline:hover {
+  text-decoration: underline;
+}
+
+.pf-archive-toggle {
+  display: inline-block;
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0 0 14px;
+}
+
+.pf-archive-toggle:hover {
+  text-decoration: underline;
+}
+
+.pf-action-error {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: color-mix(in srgb, #dc6a5c 14%, transparent);
+  border: 1px solid color-mix(in srgb, #dc6a5c 40%, transparent);
+  color: #dc6a5c;
+  font-size: 13px;
+}
+
+.pf-empty {
+  text-align: center;
+  padding: 50px 20px;
+  color: var(--text-muted);
+}
+
+.pf-empty p {
+  margin-bottom: 18px;
+  font-size: 14px;
+}
+
+.pf-empty-inline {
+  font-size: 13px;
+  color: var(--text-muted);
+  padding: 4px 0 4px;
+}
+
+.pf-btn-primary {
+  display: inline-block;
+  padding: 11px 24px;
+  border-radius: 999px;
+  background: var(--text);
+  color: var(--bg);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* Tabla de pedidos */
+.pf-table-wrap {
+  overflow-x: auto;
+  margin: 0 -4px;
+}
+
+.pf-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 640px;
+}
+
+.pf-table thead th {
+  text-align: left;
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 700;
+  padding: 0 10px 12px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.pf-col-actions {
+  text-align: right;
+}
+
+.pf-table-row td {
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+.pf-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.pf-cell-id {
+  font-weight: 700;
+  font-family: 'Space Mono', monospace;
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+
+.pf-cell-muted {
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.pf-table td:last-child {
+  text-align: right;
+}
+
+.pf-product-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pf-product-thumb {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.pf-product-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pf-product-info {
+  min-width: 0;
+}
+
+.pf-product-name {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+.pf-product-more {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+.pf-btn-detail {
+  padding: 7px 15px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.pf-btn-detail:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Badges de estado */
+.pf-badge {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.pf-badge-sm {
+  padding: 3px 9px;
+  font-size: 10.5px;
+}
+
+.pf-status-delivered {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  color: var(--accent-strong);
+}
+
+.pf-status-shipped {
+  background: color-mix(in srgb, #5b8fd9 20%, transparent);
+  color: #5b8fd9;
+}
+
+.pf-status-confirmed {
+  background: color-mix(in srgb, #5b8fd9 12%, transparent);
+  color: #5b8fd9;
+}
+
+.pf-status-pending {
+  background: color-mix(in srgb, #d9a441 20%, transparent);
+  color: #d9a441;
+}
+
+.pf-status-cancelled {
+  background: color-mix(in srgb, #dc6a5c 20%, transparent);
+  color: #dc6a5c;
+}
+
+/* Detalle expandido dentro de la tabla */
+.pf-detail-tr td {
+  padding: 0 10px 22px;
+  border-bottom: 1px solid var(--border);
+}
+
+.pf-order-details {
+  padding: 6px 4px 4px;
+  border-top: 1px dashed var(--border);
+  padding-top: 16px;
+}
+
+.pf-detail-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.pf-detail-thumb {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.pf-detail-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pf-detail-info {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+.pf-detail-name {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.pf-detail-variant {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  text-transform: capitalize;
+}
+
+.pf-detail-qty {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.pf-detail-subtotal {
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.pf-order-total {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 12px;
+  margin-top: 6px;
+  border-top: 1px solid var(--border);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.pf-order-cancel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.pf-btn-cancel {
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pf-btn-cancel:hover {
+  border-color: #dc6a5c;
+  color: #dc6a5c;
+}
+
+.pf-cancel-confirm-text {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.pf-btn-danger-sm,
+.pf-btn-ghost-sm {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text);
+}
+
+.pf-btn-danger-sm {
+  border-color: #dc6a5c;
+  color: #dc6a5c;
+}
+
+.pf-seller-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.pf-btn-accept {
+  padding: 7px 15px;
+  border-radius: 999px;
+  border: none;
+  background: var(--accent);
+  color: var(--bg);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.pf-btn-accept:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.pf-state-msg {
+  padding: 50px 24px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.pf-state-error {
+  color: #dc6a5c;
+}
+
+.pf-link-btn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 6px;
+}
+
+/* Paginación */
+.pf-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.pf-pagination-info {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.pf-pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pf-pagination-controls button {
+  min-width: 30px;
+  height: 30px;
+  padding: 0 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pf-pagination-controls button.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+}
+
+.pf-pagination-controls button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Alertas / accesos rápidos del admin (dentro de la tarjeta de tabla) */
+.pf-admin-alerts {
+  margin-top: 20px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+}
+
+.pf-admin-alerts-title {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.pf-admin-alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  font-size: 13px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.pf-admin-alert:hover {
+  color: var(--accent);
+}
+
+.pf-admin-alert-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.pf-admin-alert-danger {
+  background: #dc6a5c;
+}
+
+.pf-admin-alert-warning {
+  background: #d9a441;
+}
+
+.pf-admin-shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.pf-admin-shortcut {
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+button.pf-admin-shortcut { font-family: inherit; cursor: pointer; }
+
+.pf-admin-shortcut:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Panel lateral: resumen */
+.pf-summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.pf-summary-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.pf-summary-label {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.pf-summary-value-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.pf-summary-value {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.pf-summary-trend {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-strong);
+}
+
+/* Panel lateral: más vendidos (solo Admin, viene de /admin/dashboard/summary) */
+.pf-top-product-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.pf-top-product-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.pf-top-product-rank {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--accent-strong);
+  font-family: 'Space Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+.pf-top-product-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 12.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pf-top-product-sold {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+/* Panel lateral: últimos pedidos */
+.pf-recent-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.pf-recent-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.pf-recent-thumb {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.pf-recent-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pf-recent-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pf-recent-id {
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pf-recent-right {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.pf-recent-total {
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.pf-recent-time {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* Panel lateral: tip / mensaje motivacional */
+.pf-tip-card {
+  background: linear-gradient(155deg, color-mix(in srgb, var(--accent) 16%, var(--bg-elevated)), var(--bg-elevated));
+}
+
+.pf-tip-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  color: var(--accent-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.pf-tip-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.pf-tip-text {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.pf-tip-link {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.pf-tip-link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 980px) {
+  .pf-kpi-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .pf-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pf-side-col {
+    position: static;
+  }
+}
+
+@media (max-width: 560px) {
+  .pf-page {
+    padding: 28px 16px 70px;
+  }
+
+  .pf-kpi-row {
+    grid-template-columns: 1fr;
+  }
+
+  .pf-header {
+    align-items: flex-start;
+  }
+
+  .pf-header-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

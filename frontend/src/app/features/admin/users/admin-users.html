@@ -1,0 +1,242 @@
+<section class="au-page">
+
+  <header class="au-header">
+    <div>
+      <h1 class="font-display">Usuarios</h1>
+      <p class="au-subtitle">Gestiona cuentas y asigna roles (Cliente, Vendedor, Admin).</p>
+    </div>
+    <button class="au-btn-ghost" type="button" (click)="reports.downloadCustomers()">⬇ Clientes (CSV)</button>
+  </header>
+
+  <div class="au-stats">
+    <div class="au-stat-card">
+      <span class="au-stat-label font-mono">TOTAL USUARIOS</span>
+      <span class="au-stat-value">{{ stats().total }}</span>
+    </div>
+    <div class="au-stat-card">
+      <span class="au-stat-label font-mono">ADMINISTRADORES</span>
+      <span class="au-stat-value">{{ stats().admins }}</span>
+    </div>
+    <div class="au-stat-card">
+      <span class="au-stat-label font-mono">VENDEDORES</span>
+      <span class="au-stat-value">{{ stats().vendedores }}</span>
+    </div>
+    <div class="au-stat-card">
+      <span class="au-stat-label font-mono">CLIENTES</span>
+      <span class="au-stat-value">{{ stats().clientes }}</span>
+    </div>
+  </div>
+
+  <div class="au-toolbar">
+    <div class="au-search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/>
+        <path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input
+        #searchInput
+        type="text"
+        placeholder="Buscar por nombre, usuario o correo..."
+        (input)="onSearchInput(searchInput.value)"
+      />
+    </div>
+
+    <select #roleSelect class="au-select" (change)="onRoleFilterChange(roleSelect.value)">
+      <option value="all">Todos los roles</option>
+      <option value="ADMIN">Administradores</option>
+      <option value="VENDEDOR">Vendedores</option>
+      <option value="CLIENTE">Clientes</option>
+      <option value="none">Sin rol</option>
+    </select>
+  </div>
+
+  @if (actionError()) {
+    <div class="au-action-error">{{ actionError() }}</div>
+  }
+
+  @if (loading()) {
+    <p class="au-state-msg">Cargando usuarios...</p>
+  } @else if (loadError()) {
+    <p class="au-state-msg au-state-error">
+      No se pudo cargar la información.
+      <button class="au-link-btn" type="button" (click)="loadAll()">Reintentar</button>
+    </p>
+  } @else if (filteredRows().length === 0) {
+    <p class="au-state-msg">No hay usuarios que coincidan con el filtro.</p>
+  } @else {
+
+    <div class="au-table-wrap">
+      <table class="au-table">
+        <thead>
+        <tr>
+          <th>Usuario</th>
+          <th>Roles</th>
+          <th class="au-col-actions">Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+          @for (row of filteredRows(); track trackByUserId($index, row)) {
+            <tr>
+              <td>
+                <p class="au-user-name">{{ row.fullName ?? row.username }}</p>
+                <p class="au-user-sub">
+                  {{ '@' }}{{ row.username }} · {{ row.email }}
+                </p>
+              </td>
+
+              <td class="au-roles-cell">
+                <div class="au-role-badges">
+                  @for (ur of row.activeRoles; track ur.id) {
+                    <span class="au-badge" [class]="roleClass(ur.role.name)">
+                      {{ ur.role.name }}
+                      <button
+                        type="button"
+                        class="au-badge-remove"
+                        [disabled]="togglingAssignmentId() === ur.id || isSelfAdminRole(row, ur)"
+                        [attr.title]="isSelfAdminRole(row, ur) ? 'No puedes quitarte tu propio rol de administrador' : 'Quitar rol'"
+                        [attr.aria-label]="'Quitar rol ' + ur.role.name"
+                        (click)="deactivateRole(ur)"
+                      >×</button>
+                    </span>
+                  }
+                  @if (row.activeRoles.length === 0) {
+                    <span class="au-no-role">Sin rol asignado</span>
+                  }
+                </div>
+
+                @if (row.inactiveRoles.length > 0) {
+                  <div class="au-inactive-roles">
+                    @for (ur of row.inactiveRoles; track ur.id) {
+                      <button
+                        type="button"
+                        class="au-reactivate"
+                        [disabled]="togglingAssignmentId() === ur.id"
+                        (click)="reactivateRole(ur)"
+                      >
+                        + Reactivar {{ ur.role.name }}
+                      </button>
+                    }
+                  </div>
+                }
+
+                <div class="au-assign-row">
+                  <select
+                    #roleAssignSelect
+                    class="au-select-sm"
+                    [disabled]="availableRolesFor(row).length === 0"
+                    (change)="onRoleSelectChange(row.id, roleAssignSelect.value)"
+                  >
+                    <option value="">
+                      {{ availableRolesFor(row).length === 0 ? 'Ya tiene todos los roles' : 'Asignar rol...' }}
+                    </option>
+                    @for (r of availableRolesFor(row); track r.id) {
+                      <option [value]="r.id">{{ r.name }}</option>
+                    }
+                  </select>
+                  <button
+                    type="button"
+                    class="au-btn-assign"
+                    [disabled]="!getSelectedRole(row.id) || savingAssignmentFor() === row.id"
+                    (click)="assignRole(row)"
+                  >
+                    {{ savingAssignmentFor() === row.id ? '...' : 'Asignar' }}
+                  </button>
+                </div>
+              </td>
+
+              <td class="au-col-actions">
+                <div class="au-row-actions">
+                  <button
+                    class="au-icon-btn"
+                    type="button"
+                    aria-label="Ver historial de pedidos"
+                    [class.au-icon-btn-active]="expandedHistoryUserId() === row.id"
+                    (click)="toggleHistory(row.id)"
+                  >
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="10"/>
+                      <path d="M12 6v6l4 2"/>
+                    </svg>
+                  </button>
+
+                  @if (confirmingDeleteUserId() === row.id) {
+                    <div class="au-confirm-delete">
+                      <span>¿Eliminar?</span>
+                      <button
+                        class="au-icon-btn au-icon-btn-danger"
+                        type="button"
+                        [disabled]="deletingUserId() === row.id"
+                        (click)="confirmDeleteUser(row.id)"
+                      >
+                        Sí
+                      </button>
+                      <button class="au-icon-btn" type="button" (click)="cancelDeleteUser()">No</button>
+                    </div>
+                  } @else {
+                    <button
+                      class="au-icon-btn au-icon-btn-danger"
+                      type="button"
+                      aria-label="Eliminar usuario"
+                      (click)="askDeleteUser(row.id)"
+                    >
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/>
+                      </svg>
+                    </button>
+                  }
+                </div>
+              </td>
+            </tr>
+
+            @if (expandedHistoryUserId() === row.id) {
+              <tr class="au-history-row">
+                <td colspan="3">
+                  @if (historyLoadingUserId() === row.id) {
+                    <p class="au-history-msg">Cargando historial...</p>
+                  } @else if (historyErrorUserId() === row.id) {
+                    <p class="au-history-msg au-history-error">No se pudo cargar el historial.</p>
+                  } @else {
+                    <div class="au-history-grid">
+                      <div class="au-history-col">
+                        <h4 class="au-history-heading">Compras (como cliente)</h4>
+                        @if (!getHistory(row.id)?.asBuyer?.length) {
+                          <p class="au-history-empty">Sin compras registradas.</p>
+                        } @else {
+                          @for (o of getHistory(row.id)!.asBuyer; track o.id) {
+                            <div class="au-history-item">
+                              <span>#{{ o.id }} · {{ formatDate(o.orderDate) }}</span>
+                              <span class="au-badge au-badge-sm" [class]="orderStatusClass(o.status)">
+                                {{ orderStatusLabel(o.status) }}
+                              </span>
+                            </div>
+                          }
+                        }
+                      </div>
+
+                      <div class="au-history-col">
+                        <h4 class="au-history-heading">Ventas (como vendedor)</h4>
+                        @if (!getHistory(row.id)?.asSeller?.length) {
+                          <p class="au-history-empty">Sin ventas registradas.</p>
+                        } @else {
+                          @for (o of getHistory(row.id)!.asSeller; track o.id) {
+                            <div class="au-history-item">
+                              <span>#{{ o.id }} · {{ formatDate(o.orderDate) }} · Cliente: {{ o.user.username }}</span>
+                              <span class="au-badge au-badge-sm" [class]="orderStatusClass(o.status)">
+                                {{ orderStatusLabel(o.status) }}
+                              </span>
+                            </div>
+                          }
+                        }
+                      </div>
+                    </div>
+                  }
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+</section>
